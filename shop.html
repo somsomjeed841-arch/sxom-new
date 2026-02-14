@@ -239,6 +239,8 @@ onAuthStateChanged(auth, (user)=>{
   }else{
     document.querySelector(".avatar").innerText =
       user.email.charAt(0).toUpperCase();
+
+        document.getElementById("userEmail").innerText = user.email;
   }
 });
 
@@ -257,6 +259,22 @@ window.goProfile = function(){
 window.logout = async function(){
   await signOut(auth);
   window.location.href = "index.html";
+}
+window.toggleMenu = function(){
+  const menu = document.getElementById("menu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+window.goProfile = function(){
+  alert("ไปหน้าโปรไฟล์ (ทำเพิ่มได้)");
+}
+
+window.goCart = function(){
+  alert("ไปหน้าตะกร้า");
+}
+
+window.goHistory = function(){
+  alert("ไปหน้าประวัติการซื้อ");
 }
 </script>
 
