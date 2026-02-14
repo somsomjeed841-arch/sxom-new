@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SXOM Auth</title>
+</head>
+<body>
+
+<h2>Register</h2>
+<form id="registerForm">
+  <input id="regEmail" type="email" placeholder="Email" required>
+  <input id="regPass" type="password" placeholder="Password" required>
+  <button type="submit">REGISTER</button>
+</form>
+
+<hr>
+
+<h2>Login</h2>
+<form id="loginForm">
+  <input id="loginEmail" type="email" placeholder="Email" required>
+  <input id="loginPass" type="password" placeholder="Password" required>
+  <button type="submit">LOGIN</button>
+</form>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword }
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+  authDomain: "sxom-new.firebaseapp.com",
+  projectId: "sxom-new",
+  storageBucket: "sxom-new.firebasestorage.app",
+  messagingSenderId: "832664032721",
+  appId: "1:832664032721:web:80e756057b10d8d91d3cf0",
+  measurementId: "G-ZLTZSZCMHQ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// REGISTER
+document.getElementById("registerForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const email = regEmail.value;
+  const pass = regPass.value;
+
+  try{
+    await createUserWithEmailAndPassword(auth,email,pass);
+    alert("สมัครสำเร็จ");
+  }catch(error){
+    alert(error.message);
+  }
+});
+
+// LOGIN
+document.getElementById("loginForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const email = loginEmail.value;
+  const pass = loginPass.value;
+
+  try{
+    await signInWithEmailAndPassword(auth,email,pass);
+    window.location.href = "dashboard.html";
+  }catch(error){
+    alert(error.message);
+  }
+});
+</script>
+
+</body>
+</html>
