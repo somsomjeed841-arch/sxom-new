@@ -180,7 +180,7 @@ body{
 
 <!-- NAVBAR -->
 <div class="navbar">
-  <div class="logo">SXOM Shop</div>
+  <div class="logo">SXOM JEXM</div>
 
   <div class="profile">
     <div class="avatar" onclick="toggleMenu()">U</div>
@@ -192,6 +192,7 @@ body{
       </div>
 
       <div class="dropdown-item" onclick="goProfile()">👤 My Profile</div>
+      <div class="dropdown-item" onclick="openTopUp()">💰 Top Up</div>
       <div class="dropdown-item" onclick="goCart()">🛒 My Cart</div>
       <div class="dropdown-item" onclick="goHistory()">📦 Purchase History</div>
       <div class="dropdown-item logout" onclick="logout()">🚪 Logout</div>
@@ -276,7 +277,76 @@ window.goCart = function(){
 window.goHistory = function(){
   alert("ไปหน้าประวัติการซื้อ");
 }
+window.openTopUp = function(){
+  document.getElementById("topupModal").style.display = "flex";
+}
+
+window.closeTopUp = function(){
+  document.getElementById("topupModal").style.display = "none";
+}
+
+window.fakeTopUp = function(){
+  const amount = document.getElementById("topupAmount").value;
+
+  if(!amount || amount <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  alert("Top up system coming soon 💰");
+  closeTopUp();
+}
 </script>
+
+  <!-- TOP UP MODAL -->
+<div id="topupModal" style="
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+display:none;
+justify-content:center;
+align-items:center;
+">
+
+  <div style="
+  width:350px;
+  background:#f3eee9;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.3);
+  text-align:center;
+  ">
+
+    <h3 style="margin-bottom:15px;color:#3e2f27;">Top Up Balance</h3>
+
+    <input id="topupAmount" type="number" placeholder="Enter amount"
+    style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4c4b8;margin-bottom:15px;">
+
+    <button onclick="fakeTopUp()" style="
+    width:100%;
+    padding:10px;
+    background:#8c6b5a;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    ">Confirm</button>
+
+    <button onclick="closeTopUp()" style="
+    width:100%;
+    margin-top:10px;
+    padding:8px;
+    background:transparent;
+    border:none;
+    color:#8c6b5a;
+    cursor:pointer;
+    ">Cancel</button>
+
+  </div>
+</div>
 
 </body>
 </html>
