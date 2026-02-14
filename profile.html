@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>My Profile</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI', sans-serif;
+}
+
+body{
+  background:#d8ccc2;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.card{
+  width:500px;
+  background:#f3eee9;
+  padding:40px;
+  border-radius:25px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  text-align:center;
+  animation:fade .4s ease;
+}
+
+@keyframes fade{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+.avatar{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  background:#8c6b5a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:35px;
+  margin:0 auto 20px auto;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+h2{
+  margin-bottom:10px;
+  color:#3e2f27;
+}
+
+.info{
+  margin-top:20px;
+  text-align:left;
+  font-size:15px;
+  color:#3e2f27;
+}
+
+.info div{
+  margin-bottom:12px;
+  padding:10px;
+  background:#ede5df;
+  border-radius:10px;
+}
+
+button{
+  margin-top:25px;
+  padding:10px 20px;
+  border:none;
+  border-radius:10px;
+  background:#8c6b5a;
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+}
+
+button:hover{
+  opacity:.9;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="avatar" id="avatar">U</div>
+  <h2>My Profile</h2>
+
+  <div class="info">
+    <div>Email: <span id="email"></span></div>
+    <div>User ID: <span id="uid"></span></div>
+    <div>Balance: <span id="balance">฿0</span></div>
+  </div>
+
+  <button onclick="goBack()">Back to Shop</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+import { getFirestore, doc, getDoc }
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+  authDomain: "sxom-new.firebaseapp.com",
+  projectId: "sxom-new",
+  storageBucket: "sxom-new.firebasestorage.app",
+  messagingSenderId: "832664032721",
+  appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    window.location.href = "index.html";
+  }else{
+    document.getElementById("avatar").innerText =
+      user.email.charAt(0).toUpperCase();
+
+    document.getElementById("email").innerText = user.email;
+    document.getElementById("uid").innerText = user.uid;
+
+    const snap = await getDoc(doc(db,"users",user.uid));
+    if(snap.exists()){
+      document.getElementById("balance").innerText =
+        "฿" + snap.data().balance;
+    }
+  }
+});
+
+window.goBack = function(){
+  window.location.href = "shop.html";
+}
+</script>
+
+</body>
+</html>
