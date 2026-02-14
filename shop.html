@@ -139,13 +139,21 @@ body{
 
 <!-- NAVBAR -->
 <div class="navbar">
-  <div class="logo">SXOM JEXM</div>
+  <div class="logo">SXOM Shop</div>
 
-  <div class="profile" onclick="toggleMenu()">
-    <div class="avatar">U</div>
+  <div class="profile">
+    <div class="avatar" onclick="toggleMenu()">U</div>
+
     <div class="dropdown" id="menu">
-      <div onclick="goProfile()">My Profile</div>
-      <div onclick="logout()">Logout</div>
+      <div class="dropdown-header">
+        <strong id="userEmail">User</strong>
+        <p>Balance: <span id="balance">฿1,000</span></p>
+      </div>
+
+      <div class="dropdown-item" onclick="goProfile()">👤 My Profile</div>
+      <div class="dropdown-item" onclick="goCart()">🛒 My Cart</div>
+      <div class="dropdown-item" onclick="goHistory()">📦 Purchase History</div>
+      <div class="dropdown-item logout" onclick="logout()">🚪 Logout</div>
     </div>
   </div>
 </div>
