@@ -43,9 +43,9 @@ body{
 
 .card img{
   width:100%;
-  height:140px;
+  height:220px;
   object-fit:cover;
-  border-radius:15px;
+  border-radius:15px 15px 0 0;
   margin-bottom:15px;
 }
 
@@ -110,10 +110,12 @@ if(products[category]){
     grid.innerHTML += `
       <div class="card">
         <img src="${p.img}">
+          <div style="padding:20px;">
         <h3>${p.name}</h3>
         <div class="price">฿${p.price}</div>
         <button class="add" onclick="addToCart('${p.name}')">Add to Cart</button>
         <button class="buy" onclick="buyNow('${p.name}')">Buy Now</button>
+      </div>
       </div>
     `;
   });
