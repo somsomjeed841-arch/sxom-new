@@ -189,7 +189,7 @@ window.login = async function(){
 
   try{
     await signInWithEmailAndPassword(auth,email,pass);
-    window.location.href = "dashboard.html";
+    window.location.href = "shop.html";
   }catch(error){
     alert(error.message);
   }
