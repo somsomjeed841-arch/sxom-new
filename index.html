@@ -3,24 +3,135 @@
 <head>
 <meta charset="UTF-8">
 <title>SXOM Auth</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#d8ccc2;
+}
+
+/* กล่องลอย */
+.card{
+  width:380px;
+  padding:40px;
+  border-radius:20px;
+  background:#f3eee9;
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  text-align:center;
+  position:relative;
+  animation:fadeIn .5s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+h2{
+  margin-bottom:20px;
+  font-weight:600;
+  color:#3e2f27;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #d4c4b8;
+  background:#fff;
+  outline:none;
+  transition:.2s;
+}
+
+input:focus{
+  border-color:#8c6b5a;
+  box-shadow:0 0 0 3px rgba(140,107,90,0.15);
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  border:none;
+  border-radius:10px;
+  background:#8c6b5a;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.switch{
+  margin-top:15px;
+  font-size:14px;
+}
+
+.switch span{
+  color:#8c6b5a;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.hidden{
+  display:none;
+}
+
+.error{
+  color:red;
+  font-size:13px;
+  margin-top:5px;
+}
+</style>
 </head>
 <body>
 
-<h2>Register</h2>
-<form id="registerForm">
-  <input id="regEmail" type="email" placeholder="Email" required>
-  <input id="regPass" type="password" placeholder="Password" required>
-  <button type="submit">REGISTER</button>
-</form>
+<div class="card">
 
-<hr>
+  <!-- LOGIN -->
+  <div id="loginBox">
+    <h2>Sign In</h2>
+    <input id="loginEmail" type="email" placeholder="Email" required>
+    <input id="loginPass" type="password" placeholder="Password" required>
+    <button onclick="login()">LOGIN</button>
+    <div class="switch">
+      Don't have an account? 
+      <span onclick="showRegister()">Create Account</span>
+    </div>
+  </div>
 
-<h2>Login</h2>
-<form id="loginForm">
-  <input id="loginEmail" type="email" placeholder="Email" required>
-  <input id="loginPass" type="password" placeholder="Password" required>
-  <button type="submit">LOGIN</button>
-</form>
+  <!-- REGISTER -->
+  <div id="registerBox" class="hidden">
+    <h2>Create Account</h2>
+    <input id="regEmail" type="email" placeholder="Email" required>
+    <input id="regPass" type="password" placeholder="Password" required>
+    <input id="regPass2" type="password" placeholder="Confirm Password" required>
+    <div id="passError" class="error"></div>
+    <button onclick="register()">REGISTER</button>
+    <div class="switch">
+      Already have an account? 
+      <span onclick="showLogin()">Sign In</span>
+    </div>
+  </div>
+
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
@@ -33,30 +144,46 @@ const firebaseConfig = {
   projectId: "sxom-new",
   storageBucket: "sxom-new.firebasestorage.app",
   messagingSenderId: "832664032721",
-  appId: "1:832664032721:web:80e756057b10d8d91d3cf0",
-  measurementId: "G-ZLTZSZCMHQ"
+  appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// REGISTER
-document.getElementById("registerForm").addEventListener("submit", async (e)=>{
-  e.preventDefault();
+window.showRegister = function(){
+  loginBox.classList.add("hidden");
+  registerBox.classList.remove("hidden");
+}
+
+window.showLogin = function(){
+  registerBox.classList.add("hidden");
+  loginBox.classList.remove("hidden");
+}
+
+// สมัคร
+window.register = async function(){
   const email = regEmail.value;
   const pass = regPass.value;
+  const pass2 = regPass2.value;
+
+  if(pass !== pass2){
+    passError.innerText = "Passwords do not match";
+    return;
+  }
+
+  passError.innerText = "";
 
   try{
     await createUserWithEmailAndPassword(auth,email,pass);
-    alert("สมัครสำเร็จ");
+    alert("Account created successfully");
+    showLogin();
   }catch(error){
     alert(error.message);
   }
-});
+}
 
-// LOGIN
-document.getElementById("loginForm").addEventListener("submit", async (e)=>{
-  e.preventDefault();
+// ล็อกอิน
+window.login = async function(){
   const email = loginEmail.value;
   const pass = loginPass.value;
 
@@ -66,7 +193,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e)=>{
   }catch(error){
     alert(error.message);
   }
-});
+}
 </script>
 
 </body>
