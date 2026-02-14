@@ -36,17 +36,13 @@ body{
   cursor:pointer;
 }
 
-.avatar{
-  width:40px;
-  height:40px;
+.avatar-img{
+  width:45px;
+  height:45px;
   border-radius:50%;
-  background:#8c6b5a;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:white;
-  font-weight:bold;
+  object-fit:cover;
   box-shadow:0 5px 15px rgba(0,0,0,0.2);
+  cursor:pointer;
 }
 
 .dropdown{
@@ -183,7 +179,7 @@ body{
   <div class="logo">SXOM JEXM</div>
 
   <div class="profile">
-    <div class="avatar" onclick="toggleMenu()">U</div>
+<img src="logo.png" class="avatar-img">
 
     <div class="dropdown" id="menu">
       <div class="dropdown-header">
