@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SXOM Shop</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI', sans-serif;
+}
+
+body{
+  background:#d8ccc2;
+  min-height:100vh;
+}
+
+/* ====== NAVBAR ====== */
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 40px;
+}
+
+.logo{
+  font-weight:700;
+  font-size:20px;
+  color:#3e2f27;
+}
+
+.profile{
+  position:relative;
+  cursor:pointer;
+}
+
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:#8c6b5a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:bold;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.dropdown{
+  position:absolute;
+  right:0;
+  top:55px;
+  background:#f3eee9;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+  overflow:hidden;
+  display:none;
+  min-width:150px;
+}
+
+.dropdown div{
+  padding:12px 15px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.dropdown div:hover{
+  background:#e5d8cf;
+}
+
+/* ====== HERO BOX ====== */
+.hero{
+  display:flex;
+  justify-content:center;
+  margin-top:40px;
+}
+
+.hero-box{
+  width:600px;
+  padding:40px;
+  border-radius:20px;
+  background:#f3eee9;
+  text-align:center;
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  animation:fade .5s ease;
+}
+
+.hero-box h1{
+  color:#3e2f27;
+  margin-bottom:10px;
+}
+
+.hero-box p{
+  color:#6b5548;
+}
+
+/* ====== CATEGORY SECTION ====== */
+.categories{
+  display:flex;
+  justify-content:center;
+  gap:30px;
+  margin-top:50px;
+  flex-wrap:wrap;
+  padding-bottom:60px;
+}
+
+.category-card{
+  width:220px;
+  height:150px;
+  border-radius:18px;
+  background:#f3eee9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+  color:#3e2f27;
+  cursor:pointer;
+  transition:.3s;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.category-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 35px rgba(0,0,0,0.25);
+}
+
+@keyframes fade{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo">SXOM Shop</div>
+
+  <div class="profile" onclick="toggleMenu()">
+    <div class="avatar">U</div>
+    <div class="dropdown" id="menu">
+      <div onclick="goProfile()">My Profile</div>
+      <div onclick="logout()">Logout</div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-box">
+    <h1>Welcome to SXOM Store</h1>
+    <p>Discover premium products curated just for you.</p>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="categories">
+  <div class="category-card">Electronics</div>
+  <div class="category-card">Fashion</div>
+  <div class="category-card">Accessories</div>
+  <div class="category-card">Home & Living</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+  authDomain: "sxom-new.firebaseapp.com",
+  projectId: "sxom-new",
+  storageBucket: "sxom-new.firebasestorage.app",
+  messagingSenderId: "832664032721",
+  appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// ถ้าไม่ login เด้งกลับหน้า login
+onAuthStateChanged(auth, (user)=>{
+  if(!user){
+    window.location.href = "index.html";
+  }else{
+    document.querySelector(".avatar").innerText =
+      user.email.charAt(0).toUpperCase();
+  }
+});
+
+// dropdown
+window.toggleMenu = function(){
+  const menu = document.getElementById("menu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// ไปหน้าโปรไฟล์
+window.goProfile = function(){
+  alert("ไปหน้าโปรไฟล์ (เดี๋ยวเราทำเพิ่มได้)");
+}
+
+// logout
+window.logout = async function(){
+  await signOut(auth);
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
