@@ -206,10 +206,10 @@ body{
 
 <!-- CATEGORIES -->
 <div class="categories">
-  <div class="category-card">BOT Trading EA</div>
-  <div class="category-card">Discrod</div>
-  <div class="category-card">Nitro</div>
-  <div class="category-card">BOT Discrod</div>
+<div class="category-card" onclick="goCategory('BOT Trading EA')">BOT Trading EA</div>
+<div class="category-card" onclick="goCategory('Discord')">Discord</div>
+<div class="category-card" onclick="goCategory('Nitro')">Nitro</div>
+<div class="category-card" onclick="goCategory('BOT Discord')">BOT Discord</div>
 </div>
 
 <script type="module">
@@ -290,6 +290,9 @@ window.fakeTopUp = function(){
   closeTopUp();
 }
   window.goCategory = function(cat){
+  window.location.href = "category.html?cat=" + encodeURIComponent(cat);
+}
+window.goCategory = function(cat){
   window.location.href = "category.html?cat=" + encodeURIComponent(cat);
 }
 </script>
