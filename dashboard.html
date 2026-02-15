@@ -7,6 +7,14 @@
 <body>
 
 <h1>Welcome Dashboard</h1>
+
+<p>Email: <span id="userEmail"></span></p>
+<p>Balance: <span class="balance-display">฿0</span></p>
+
+<input type="number" id="topupAmount" placeholder="ใส่จำนวนเงิน">
+<button onclick="fakeTopUp()">เติมเงิน</button>
+
+<br><br>
 <button id="logoutBtn">LOGOUT</button>
 
 <script type="module">
@@ -20,8 +28,7 @@ const firebaseConfig = {
   projectId: "sxom-new",
   storageBucket: "sxom-new.firebasestorage.app",
   messagingSenderId: "832664032721",
-  appId: "1:832664032721:web:80e756057b10d8d91d3cf0",
-  measurementId: "G-ZLTZSZCMHQ"
+  appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -29,24 +36,21 @@ const auth = getAuth(app);
 
 onAuthStateChanged(auth, (user)=>{
   if(!user){
-    window.location.href = "index.html";
+    window.location.href = "/index.html";
   }else{
     document.getElementById("userEmail").innerText = user.email;
-
-    let balance = parseFloat(localStorage.getItem("balance")) || 0;
-    document.getElementById("balance").innerText = "฿" + balance;
+    loadBalance();
   }
 });
 
-document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-  await signOut(auth);
-  window.location.href = "index.html";
-});
-  // โหลด balance ตอนเข้าเว็บ
-let savedBalance = parseFloat(localStorage.getItem("balance")) || 0;
-document.getElementById("balance").innerText = "฿" + savedBalance;
+function loadBalance(){
+  let balance = parseFloat(localStorage.getItem("balance")) || 0;
 
-// ระบบเติมเงินจริง
+  document.querySelectorAll(".balance-display").forEach(el=>{
+    el.innerText = "฿" + balance.toLocaleString();
+  });
+}
+
 window.fakeTopUp = function(){
 
   let amount = parseFloat(document.getElementById("topupAmount").value);
@@ -62,12 +66,15 @@ window.fakeTopUp = function(){
 
   localStorage.setItem("balance", balance);
 
-  document.getElementById("balance").innerText = "฿" + balance;
+  loadBalance();
 
   alert("เติมเงินสำเร็จ 💰");
-
-  closeTopUp();
 }
+
+document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+  await signOut(auth);
+  window.location.href = "/index.html";
+});
 </script>
 
 </body>
