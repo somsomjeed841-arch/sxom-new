@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>My Cart</title>
+
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI', sans-serif;
+  background:#d8ccc2;
+}
+
+.container{
+  max-width:1000px;
+  margin:60px auto;
+  background:#f3eee9;
+  padding:40px;
+  border-radius:25px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.2);
+}
+
+.cart-item{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  margin-bottom:20px;
+  padding:15px;
+  background:white;
+  border-radius:15px;
+}
+
+.cart-item img{
+  width:120px;
+  border-radius:10px;
+}
+
+.price{
+  font-weight:600;
+  color:#8c6b5a;
+}
+
+.total{
+  text-align:right;
+  font-size:20px;
+  font-weight:600;
+  margin-top:30px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>My Cart 🛒</h2>
+  <div id="cartItems"></div>
+  <div class="total" id="totalPrice"></div>
+</div>
+
+<script>
+
+const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+const cartContainer = document.getElementById("cartItems");
+
+let total = 0;
+
+if(cart.length === 0){
+  cartContainer.innerHTML = "<p>Your cart is empty.</p>";
+}else{
+  cart.forEach(item => {
+
+    total += item.price;
+
+    cartContainer.innerHTML += `
+      <div class="cart-item">
+        <img src="${item.img}">
+        <div>
+          <h3>${item.name}</h3>
+          <div class="price">฿${item.price}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("totalPrice").innerText =
+    "Total: ฿" + total;
+}
+
+</script>
+
+</body>
+</html>
