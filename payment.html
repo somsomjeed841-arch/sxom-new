@@ -3,35 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <title>Payment</title>
+
+<style>
+body{
+  background:#111;
+  color:white;
+  font-family:sans-serif;
+  text-align:center;
+  padding:40px;
+}
+
+.card{
+  background:#1c1c1c;
+  padding:30px;
+  margin:20px auto;
+  width:300px;
+  border-radius:15px;
+  cursor:pointer;
+}
+
+.card:hover{
+  background:#2a2a2a;
+}
+</style>
 </head>
-<body style="background:#111;color:white;text-align:center;padding-top:60px;">
+<body>
 
-<h2>ช่องทางการชำระเงิน</h2>
+<h2>เลือกช่องทางการเติมเงิน</h2>
 
-<br><br>
+<div class="card" onclick="topup(100)">
+💳 TrueMoney Wallet
+</div>
 
-<button onclick="topUp(100)" style="padding:15px 30px;font-size:18px;">
-🧧 ซองอั่งเปา TrueMoney (100฿)
-</button>
+<div class="card" onclick="topup(200)">
+🏦 ธนาคาร
+</div>
 
-<br><br>
+<div class="card" onclick="topup(300)">
+🎁 Voucher
+</div>
 
-<button onclick="topUp(500)" style="padding:15px 30px;font-size:18px;">
-🏦 โอนผ่านธนาคาร (500฿)
-</button>
+<br>
+<button onclick="back()">← กลับ</button>
 
-<br><br>
-
-<button onclick="topUp(1000)" style="padding:15px 30px;font-size:18px;">
-🎁 Voucher (1000฿)
-</button>
-
-<br><br><br>
-
-<button onclick="goBack()">⬅ กลับ Dashboard</button>
 
 <script>
-function topUp(amount){
+function topup(amount){
 
   let balance = parseFloat(localStorage.getItem("balance")) || 0;
 
@@ -39,12 +56,12 @@ function topUp(amount){
 
   localStorage.setItem("balance", balance);
 
-  alert("เติมเงินสำเร็จ 💰 +" + amount);
+  alert("เติมเงินสำเร็จ +฿" + amount);
 
   window.location.href = "./dashboard.html";
 }
 
-function goBack(){
+function back(){
   window.location.href = "./dashboard.html";
 }
 </script>
