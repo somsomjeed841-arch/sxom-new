@@ -113,7 +113,7 @@ document.getElementById("categoryTitle").innerText = category;
 const grid = document.getElementById("productGrid");
 
 if(products[category]){
-  products[category].forEach(p=>{
+  products[category].forEach((p=>{
     grid.innerHTML += `
       <div class="card">
         <img src="${p.img}">
