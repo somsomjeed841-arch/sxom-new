@@ -12,7 +12,7 @@
 <p>Balance: <span class="balance-display">฿0</span></p>
 
 <input type="number" id="topupAmount" placeholder="ใส่จำนวนเงิน">
-<button onclick="fakeTopUp()">เติมเงิน</button>
+<button onclick="goToPayment()">เติมเงิน</button>
 
 <br><br>
 <button id="logoutBtn">LOGOUT</button>
@@ -36,7 +36,7 @@ const auth = getAuth(app);
 
 onAuthStateChanged(auth, (user)=>{
   if(!user){
-    window.location.href = "/index.html";
+    window.location.href = "./index.html";
   }else{
     document.getElementById("userEmail").innerText = user.email;
     loadBalance();
@@ -51,29 +51,20 @@ function loadBalance(){
   });
 }
 
-window.fakeTopUp = function(){
-
-  let amount = parseFloat(document.getElementById("topupAmount").value);
+window.goToPayment = function(){
+  let amount = document.getElementById("topupAmount").value;
 
   if(!amount || amount <= 0){
-    alert("Invalid amount");
+    alert("กรอกจำนวนเงินก่อน");
     return;
   }
 
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
-
-  balance += amount;
-
-  localStorage.setItem("balance", balance);
-
-  loadBalance();
-
-  alert("เติมเงินสำเร็จ 💰");
+  window.location.href = "./payment.html?amount=" + amount;
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
   await signOut(auth);
-  window.location.href = "/index.html";
+  window.location.href = "./index.html";
 });
 </script>
 
