@@ -11,7 +11,7 @@
 <p>Email: <span id="userEmail"></span></p>
 <p>Balance: <span class="balance-display">฿0</span></p>
 
-<input type="number" id="topupAmount" placeholder="ใส่จำนวนเงิน">
+<br>
 <button onclick="goToPayment()">เติมเงิน</button>
 
 <br><br>
@@ -45,21 +45,13 @@ onAuthStateChanged(auth, (user)=>{
 
 function loadBalance(){
   let balance = parseFloat(localStorage.getItem("balance")) || 0;
-
   document.querySelectorAll(".balance-display").forEach(el=>{
     el.innerText = "฿" + balance.toLocaleString();
   });
 }
 
 window.goToPayment = function(){
-  let amount = document.getElementById("topupAmount").value;
-
-  if(!amount || amount <= 0){
-    alert("กรอกจำนวนเงินก่อน");
-    return;
-  }
-
-  window.location.href = "./payment.html?amount=" + amount;
+  window.location.href = "./payment.html";
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
