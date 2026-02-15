@@ -37,6 +37,32 @@ document.getElementById("logoutBtn").addEventListener("click", async ()=>{
   await signOut(auth);
   window.location.href = "index.html";
 });
+  // โหลด balance ตอนเข้าเว็บ
+let savedBalance = parseFloat(localStorage.getItem("balance")) || 0;
+document.getElementById("balance").innerText = "฿" + savedBalance;
+
+// ระบบเติมเงินจริง
+window.fakeTopUp = function(){
+
+  let amount = parseFloat(document.getElementById("topupAmount").value);
+
+  if(!amount || amount <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+
+  balance += amount;
+
+  localStorage.setItem("balance", balance);
+
+  document.getElementById("balance").innerText = "฿" + balance;
+
+  alert("เติมเงินสำเร็จ 💰");
+
+  closeTopUp();
+}
 </script>
 
 </body>
