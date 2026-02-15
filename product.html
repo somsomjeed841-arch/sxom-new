@@ -52,9 +52,22 @@ body{
 }
 
 .description{
-  margin-bottom:20px;
+  background:#fff;
+  border:2px solid #d4c4b8;
+  border-radius:15px;
+  padding:20px;
+  margin-bottom:25px;
   color:#5b463a;
-  line-height:1.6;
+  line-height:1.7;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.description-title{
+  font-weight:600;
+  margin-bottom:10px;
+  color:#3e2f27;
+  font-size:15px;
+  letter-spacing:1px;
 }
 
 iframe{
@@ -107,9 +120,10 @@ button{
       <h2 id="productName"></h2>
       <div class="price" id="productPrice"></div>
 
-      <div class="description">
-        This is a premium product with high performance and quality.
-      </div>
+<div class="description">
+  <div class="description-title">PRODUCT DETAILS</div>
+  This is a premium product with high performance and quality.
+</div>
 
       <iframe id="youtubeVideo" allowfullscreen></iframe>
 
