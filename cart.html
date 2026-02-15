@@ -123,6 +123,31 @@ function decreaseQty(index){
   localStorage.setItem("cart", JSON.stringify(cart));
   location.reload();
 }
+  function checkout(){
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+
+  let total = 0;
+
+  cart.forEach(item=>{
+    total += item.price * item.qty;
+  });
+
+  if(balance < total){
+    alert("เงินไม่พอ ❌");
+    return;
+  }
+
+  balance -= total;
+
+  localStorage.setItem("balance", balance);
+  localStorage.removeItem("cart");
+
+  alert("สั่งซื้อสำเร็จ ✅");
+
+  window.location.href = "dashboard.html";
+}
 </script>
   
 </body>
