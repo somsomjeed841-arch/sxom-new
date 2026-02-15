@@ -8,22 +8,19 @@
 
 <h2>ช่องทางการชำระเงิน</h2>
 
-<p id="showAmount"></p>
-
 <br><br>
 
-<button onclick="payNow()" style="padding:15px 30px;font-size:18px;">
-ชำระเงิน (จำลอง)
-</button>
+<button onclick="topUp(100)">เติม 100 บาท</button>
+<br><br>
+<button onclick="topUp(500)">เติม 500 บาท</button>
+<br><br>
+<button onclick="topUp(1000)">เติม 1,000 บาท</button>
+
+<br><br><br>
+<button onclick="goBack()">⬅ กลับ Dashboard</button>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const amount = parseFloat(params.get("amount")) || 0;
-
-document.getElementById("showAmount").innerText =
-  "ยอดเติมเงิน: ฿" + amount.toLocaleString();
-
-function payNow(){
+function topUp(amount){
 
   let balance = parseFloat(localStorage.getItem("balance")) || 0;
 
@@ -31,8 +28,12 @@ function payNow(){
 
   localStorage.setItem("balance", balance);
 
-  alert("เติมเงินสำเร็จ 💰");
+  alert("เติมเงินสำเร็จ 💰 +" + amount);
 
+  window.location.href = "./dashboard.html";
+}
+
+function goBack(){
   window.location.href = "./dashboard.html";
 }
 </script>
