@@ -68,10 +68,6 @@ button{
   cursor:pointer;
   font-weight:600;
 }
-
-button:hover{
-  opacity:.9;
-}
 </style>
 </head>
 <body>
@@ -94,8 +90,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebas
 import { getAuth, onAuthStateChanged }
 from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
+/* 🔥 ใส่ config ของจริงคุณตรงนี้ */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
   authDomain: "sxom-new.firebaseapp.com",
   projectId: "sxom-new",
   storageBucket: "sxom-new.firebasestorage.app",
@@ -106,14 +103,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+/* 🔥 สำคัญ: รอ Firebase โหลด session ก่อน */
 onAuthStateChanged(auth, (user)=>{
-  if(!user){
-    window.location.href = "index.html";
-  }else{
+  if (user) {
     document.getElementById("email").innerText = user.email;
     document.getElementById("uid").innerText = user.uid;
-
-    loadBalance(); // 👈 โหลดเงินจาก localStorage
+    loadBalance();
+  } else {
+    // ใช้ absolute path กัน GitHub พัง
+    window.location.href = "./index.html";
   }
 });
 
@@ -123,8 +121,9 @@ function loadBalance(){
     "฿" + balance.toLocaleString();
 }
 
+/* 🔥 ใช้ path แบบปลอดภัยกับ GitHub Pages */
 window.goBack = function(){
-  window.location.href = "shop.html";
+  window.location.href = "./dashboard.html";
 }
 </script>
 
