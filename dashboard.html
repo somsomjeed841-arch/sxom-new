@@ -17,6 +17,7 @@
 <br><br>
 <button id="logoutBtn">LOGOUT</button>
 
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut }
@@ -45,13 +46,14 @@ onAuthStateChanged(auth, (user)=>{
 
 function loadBalance(){
   let balance = parseFloat(localStorage.getItem("balance")) || 0;
+
   document.querySelectorAll(".balance-display").forEach(el=>{
     el.innerText = "฿" + balance.toLocaleString();
   });
 }
 
 window.goToPayment = function(){
-  window.location.href = "./payment.html";
+  window.location.href = "./payment.html"; // ✅ เด้งไปหน้าเลือกช่องทาง
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
