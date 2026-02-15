@@ -1,1 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Payment</title>
+</head>
+<body style="background:#111;color:white;text-align:center;padding-top:50px;">
 
+<h2>ช่องทางการชำระเงิน</h2>
+
+<p id="showAmount"></p>
+
+<br><br>
+
+<button onclick="payNow()" style="padding:15px 30px;font-size:18px;">
+ชำระเงิน (จำลอง)
+</button>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const amount = parseFloat(params.get("amount")) || 0;
+
+document.getElementById("showAmount").innerText =
+  "ยอดเติมเงิน: ฿" + amount.toLocaleString();
+
+function payNow(){
+
+  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+
+  balance += amount;
+
+  localStorage.setItem("balance", balance);
+
+  alert("เติมเงินสำเร็จ 💰");
+
+  window.location.href = "./dashboard.html";
+}
+</script>
+
+</body>
+</html>
