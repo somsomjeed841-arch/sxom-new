@@ -17,7 +17,6 @@ body{
   min-height:100vh;
 }
 
-/* ====== NAVBAR ====== */
 .navbar{
   display:flex;
   justify-content:space-between;
@@ -45,90 +44,6 @@ body{
   cursor:pointer;
 }
 
-.dropdown{
-  position:absolute;
-  right:0;
-  top:55px;
-  background:#f3eee9;
-  border-radius:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
-  overflow:hidden;
-  display:none;
-  min-width:150px;
-}
-
-.dropdown div{
-  padding:12px 15px;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.dropdown div:hover{
-  background:#e5d8cf;
-}
-
-/* ====== HERO BOX ====== */
-.hero{
-  display:flex;
-  justify-content:center;
-  margin-top:40px;
-}
-
-.hero-box{
-  width:600px;
-  padding:40px;
-  border-radius:20px;
-  background:#f3eee9;
-  text-align:center;
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.15),
-    inset 0 1px 0 rgba(255,255,255,0.6);
-  animation:fade .5s ease;
-}
-
-.hero-box h1{
-  color:#3e2f27;
-  margin-bottom:10px;
-}
-
-.hero-box p{
-  color:#6b5548;
-}
-
-/* ====== CATEGORY SECTION ====== */
-.categories{
-  display:flex;
-  justify-content:center;
-  gap:30px;
-  margin-top:50px;
-  flex-wrap:wrap;
-  padding-bottom:60px;
-}
-
-.category-card{
-  width:220px;
-  height:150px;
-  border-radius:18px;
-  background:#f3eee9;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:600;
-  color:#3e2f27;
-  cursor:pointer;
-  transition:.3s;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
-}
-
-.category-card:hover{
-  transform:translateY(-5px);
-  box-shadow:0 15px 35px rgba(0,0,0,0.25);
-}
-
-@keyframes fade{
-  from{opacity:0; transform:translateY(20px);}
-  to{opacity:1; transform:translateY(0);}
-}
 .dropdown{
   position:absolute;
   right:0;
@@ -170,25 +85,85 @@ body{
   color:#a94442;
   font-weight:600;
 }
+
+.hero{
+  display:flex;
+  justify-content:center;
+  margin-top:40px;
+}
+
+.hero-box{
+  width:600px;
+  padding:40px;
+  border-radius:20px;
+  background:#f3eee9;
+  text-align:center;
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  animation:fade .5s ease;
+}
+
+.hero-box h1{
+  color:#3e2f27;
+  margin-bottom:10px;
+}
+
+.hero-box p{
+  color:#6b5548;
+}
+
+.categories{
+  display:flex;
+  justify-content:center;
+  gap:30px;
+  margin-top:50px;
+  flex-wrap:wrap;
+  padding-bottom:60px;
+}
+
+.category-card{
+  width:220px;
+  height:150px;
+  border-radius:18px;
+  background:#f3eee9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+  color:#3e2f27;
+  cursor:pointer;
+  transition:.3s;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.category-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 35px rgba(0,0,0,0.25);
+}
+
+@keyframes fade{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
 </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <div class="navbar">
   <div class="logo">SXOM JEXM</div>
 
   <div class="profile">
-<img src="logo.png" class="avatar-img" onclick="toggleMenu()">
+    <img src="logo.png" class="avatar-img" onclick="toggleMenu()">
 
     <div class="dropdown" id="menu">
       <div class="dropdown-header">
         <strong id="userEmail">User</strong>
-        <p>Balance: <span id="balance">฿1,000</span></p>
+        <p>Balance: <span id="balance">฿0</span></p>
       </div>
 
       <div class="dropdown-item" onclick="goProfile()">👤 My Profile</div>
-      <div class="dropdown-item" onclick="openTopUp()">💰 Top Up</div>
+      <div class="dropdown-item" onclick="goPayment()">💰 Top Up</div>
       <div class="dropdown-item" onclick="goCart()">🛒 My Cart</div>
       <div class="dropdown-item" onclick="goHistory()">📦 Purchase History</div>
       <div class="dropdown-item logout" onclick="logout()">🚪 Logout</div>
@@ -196,7 +171,6 @@ body{
   </div>
 </div>
 
-<!-- HERO -->
 <div class="hero">
   <div class="hero-box">
     <h1>Welcome to SXOM JEXM</h1>
@@ -204,13 +178,12 @@ body{
   </div>
 </div>
 
-<!-- CATEGORIES -->
 <div class="categories">
-<div class="category-card" onclick="goCategory('BOT Trading EA')">BOT Trading EA</div>
-<div class="category-card" onclick="goCategory('Discord')">Discord</div>
-<div class="category-card" onclick="goCategory('Nitro')">Nitro</div>
-<div class="category-card" onclick="goCategory('BOT Discord')">BOT Discord</div>
-<div class="category-card" onclick="goCategory('Reshade')">Reshade</div>
+  <div class="category-card" onclick="goCategory('BOT Trading EA')">BOT Trading EA</div>
+  <div class="category-card" onclick="goCategory('Discord')">Discord</div>
+  <div class="category-card" onclick="goCategory('Nitro')">Nitro</div>
+  <div class="category-card" onclick="goCategory('BOT Discord')">BOT Discord</div>
+  <div class="category-card" onclick="goCategory('Reshade')">Reshade</div>
 </div>
 
 <script type="module">
@@ -230,31 +203,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// ถ้าไม่ login เด้งกลับหน้า login
 onAuthStateChanged(auth, (user)=>{
   if(!user){
     window.location.href = "index.html";
   }else{
-        document.getElementById("userEmail").innerText = user.email;
+    document.getElementById("userEmail").innerText = user.email;
+    loadBalance();
   }
 });
 
-// dropdown
-window.toggleMenu = function(){
-  const menu = document.getElementById("menu");
-  menu.style.display = menu.style.display === "block" ? "none" : "block";
+function loadBalance(){
+  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+  document.getElementById("balance").innerText =
+    "฿" + balance.toLocaleString();
 }
 
-// ไปหน้าโปรไฟล์
-window.goProfile = function(){
-  alert("ไปหน้าโปรไฟล์ (เดี๋ยวเราทำเพิ่มได้)");
-}
-
-// logout
-window.logout = async function(){
-  await signOut(auth);
-  window.location.href = "index.html";
-}
 window.toggleMenu = function(){
   const menu = document.getElementById("menu");
   menu.style.display = menu.style.display === "block" ? "none" : "block";
@@ -264,6 +227,10 @@ window.goProfile = function(){
   window.location.href = "profile.html";
 }
 
+window.goPayment = function(){
+  window.location.href = "payment.html";
+}
+
 window.goCart = function(){
   window.location.href = "cart.html";
 }
@@ -271,82 +238,16 @@ window.goCart = function(){
 window.goHistory = function(){
   alert("ไปหน้าประวัติการซื้อ");
 }
-window.openTopUp = function(){
-  document.getElementById("topupModal").style.display = "flex";
-}
 
-window.closeTopUp = function(){
-  document.getElementById("topupModal").style.display = "none";
-}
-
-window.fakeTopUp = function(){
-  const amount = document.getElementById("topupAmount").value;
-
-  if(!amount || amount <= 0){
-    alert("Invalid amount");
-    return;
-  }
-
-  alert("Top up system coming soon 💰");
-  closeTopUp();
-}
-  window.goCategory = function(cat){
-  window.location.href = "category.html?cat=" + encodeURIComponent(cat);
-}
 window.goCategory = function(cat){
   window.location.href = "category.html?cat=" + encodeURIComponent(cat);
 }
+
+window.logout = async function(){
+  await signOut(auth);
+  window.location.href = "index.html";
+}
 </script>
-
-  <!-- TOP UP MODAL -->
-<div id="topupModal" style="
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.4);
-display:none;
-justify-content:center;
-align-items:center;
-">
-
-  <div style="
-  width:350px;
-  background:#f3eee9;
-  padding:30px;
-  border-radius:20px;
-  box-shadow:0 20px 40px rgba(0,0,0,0.3);
-  text-align:center;
-  ">
-
-    <h3 style="margin-bottom:15px;color:#3e2f27;">Top Up Balance</h3>
-
-    <input id="topupAmount" type="number" placeholder="Enter amount"
-    style="width:100%;padding:10px;border-radius:10px;border:1px solid #d4c4b8;margin-bottom:15px;">
-
-    <button onclick="fakeTopUp()" style="
-    width:100%;
-    padding:10px;
-    background:#8c6b5a;
-    color:white;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    ">Confirm</button>
-
-    <button onclick="closeTopUp()" style="
-    width:100%;
-    margin-top:10px;
-    padding:8px;
-    background:transparent;
-    border:none;
-    color:#8c6b5a;
-    cursor:pointer;
-    ">Cancel</button>
-
-  </div>
-</div>
 
 </body>
 </html>
