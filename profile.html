@@ -79,7 +79,7 @@ button{
   <div class="info">
     <div>Email: <span id="email"></span></div>
     <div>User ID: <span id="uid"></span></div>
-    <div>Balance: <span id="balance">฿0</span></div>
+    <div>Balance: <span class="balance-display">฿0</span></div>
   </div>
 
   <button onclick="goBack()">Back to Shop</button>
@@ -90,7 +90,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebas
 import { getAuth, onAuthStateChanged }
 from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-/* 🔥 ใส่ config ของจริงคุณตรงนี้ */
 const firebaseConfig = {
   apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
   authDomain: "sxom-new.firebaseapp.com",
@@ -103,27 +102,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-/* 🔥 สำคัญ: รอ Firebase โหลด session ก่อน */
 onAuthStateChanged(auth, (user)=>{
   if (user) {
     document.getElementById("email").innerText = user.email;
     document.getElementById("uid").innerText = user.uid;
     loadBalance();
   } else {
-    // ใช้ absolute path กัน GitHub พัง
-    window.location.href = "./index.html";
+    window.location.href = "/index.html";
   }
 });
 
 function loadBalance(){
   let balance = parseFloat(localStorage.getItem("balance")) || 0;
-  document.getElementById("balance").innerText =
-    "฿" + balance.toLocaleString();
+
+  document.querySelectorAll(".balance-display").forEach(el=>{
+    el.innerText = "฿" + balance.toLocaleString();
+  });
 }
 
-/* 🔥 ใช้ path แบบปลอดภัยกับ GitHub Pages */
 window.goBack = function(){
-  window.location.href = "./shop.html";
+  window.location.href = "/shop.html";
 }
 </script>
 
