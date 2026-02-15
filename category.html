@@ -121,7 +121,7 @@ if(products[category]){
         <h3>${p.name}</h3>
         <div class="price">฿${p.price}</div>
         <button class="add" onclick="addToCart('${p.name}')">Add to Cart</button>
-        <button class="buy" onclick="buyNow('${p.name}')">Buy Now</button>
+        <button class="buy" onclick="viewProduct('${p.name}', '${category}')">View</button>
       </div>
       </div>
     `;
@@ -131,9 +131,12 @@ if(products[category]){
 function addToCart(name){
   alert(name + " added to cart 🛒");
 }
-
-function buyNow(name){
-  alert("Proceed to buy " + name + " ⚡");
+function viewProduct(name, category){
+  window.location.href =
+    "product.html?cat=" +
+    encodeURIComponent(category) +
+    "&name=" +
+    encodeURIComponent(name);
 }
 </script>
 
