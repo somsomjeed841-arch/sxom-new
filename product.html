@@ -186,7 +186,8 @@ function addToCart(){
     name: product.name,
     price: product.price,
     img: product.img,
-    category: category
+    category: category,
+    qty:1
   };
 
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
