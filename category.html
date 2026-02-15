@@ -100,9 +100,9 @@ const products = {
     {name:"blacklist BOT", price:199, img:"bl.PNG"}
   ],
   "Reshade": [
-  {name:"SXOM V1", price:39, img:"vps1.PNG"},
-  {name:"SXOM V2", price:39, img:"vps2.PNG"}
-],
+    {name:"SXOM V1", price:39, img:"vps1.PNG"},
+    {name:"SXOM V2", price:39, img:"vps2.PNG"}
+  ]
 };
 
 const params = new URLSearchParams(window.location.search);
@@ -113,16 +113,22 @@ document.getElementById("categoryTitle").innerText = category;
 const grid = document.getElementById("productGrid");
 
 if(products[category]){
-  products[category].forEach((p=>{
+  products[category].forEach((p) => {
     grid.innerHTML += `
       <div class="card">
         <img src="${p.img}">
-          <div style="padding:20px;">
-        <h3>${p.name}</h3>
-        <div class="price">฿${p.price}</div>
-        <button class="add"onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">Add to Cart</button>
-        <button class="buy" onclick="viewProduct('${p.name}', '${category}')">View</button>
-      </div>
+        <div style="padding:20px;">
+          <h3>${p.name}</h3>
+          <div class="price">฿${p.price}</div>
+          <button class="add"
+            onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">
+            Add to Cart
+          </button>
+          <button class="buy"
+            onclick="viewProduct('${p.name}', '${category}')">
+            View
+          </button>
+        </div>
       </div>
     `;
   });
@@ -136,13 +142,14 @@ function addToCart(name, price, img){
     name: name,
     price: price,
     img: img,
-    qty:1
+    qty: 1
   });
 
   localStorage.setItem("cart", JSON.stringify(cart));
 
   alert("เพิ่มสินค้าแล้ว 🛒");
 }
+
 function viewProduct(name, category){
   window.location.href =
     "product.html?cat=" +
@@ -150,6 +157,7 @@ function viewProduct(name, category){
     "&name=" +
     encodeURIComponent(name);
 }
+
 </script>
 
 </body>
