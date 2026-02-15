@@ -108,6 +108,21 @@ function removeItem(index){
 
   location.reload();
 }
+  function increaseQty(index){
+  let cart = JSON.parse(localStorage.getItem("cart"));
+  cart[index].qty += 1;
+  localStorage.setItem("cart", JSON.stringify(cart));
+  location.reload();
+}
+
+function decreaseQty(index){
+  let cart = JSON.parse(localStorage.getItem("cart"));
+  if(cart[index].qty > 1){
+    cart[index].qty -= 1;
+  }
+  localStorage.setItem("cart", JSON.stringify(cart));
+  location.reload();
+}
 </script>
   
 </body>
