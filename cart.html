@@ -77,7 +77,11 @@ cart.forEach((item, index) => {
       <div style="flex:1;">
         <h3>${item.name}</h3>
         <div class="price">฿${item.price}</div>
-        <p>จำนวน: ${item.qty}</p>
+        <div>
+  <button onclick="decreaseQty(${index})">-</button>
+  <span style="margin:0 10px">${item.qty}</span>
+  <button onclick="increaseQty(${index})">+</button>
+</div>
       </div>
       <button onclick="removeItem(${index})" style="
         background:#a94442;
