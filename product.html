@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Product Detail</title>
+
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI', sans-serif;
+  background:#d8ccc2;
+}
+
+.container{
+  max-width:1100px;
+  margin:60px auto;
+  background:#f3eee9;
+  border-radius:25px;
+  padding:40px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.2);
+}
+
+.product-layout{
+  display:flex;
+  gap:50px;
+  flex-wrap:wrap;
+}
+
+.left{
+  flex:1;
+}
+
+.left img{
+  width:100%;
+  border-radius:20px;
+}
+
+.right{
+  flex:1;
+}
+
+.right h2{
+  margin-bottom:15px;
+  color:#3e2f27;
+}
+
+.price{
+  font-size:20px;
+  font-weight:600;
+  color:#8c6b5a;
+  margin:10px 0 20px;
+}
+
+.description{
+  margin-bottom:20px;
+  color:#5b463a;
+  line-height:1.6;
+}
+
+iframe{
+  width:100%;
+  height:250px;
+  border-radius:15px;
+  margin-bottom:20px;
+}
+
+button{
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  margin-right:10px;
+}
+
+.add{
+  background:#8c6b5a;
+  color:white;
+}
+
+.buy{
+  background:#3e2f27;
+  color:white;
+}
+
+.discount-box{
+  margin-top:20px;
+}
+
+.discount-box input{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #d4c4b8;
+  width:200px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="product-layout">
+
+    <div class="left">
+      <img id="productImg">
+    </div>
+
+    <div class="right">
+      <h2 id="productName"></h2>
+      <div class="price" id="productPrice"></div>
+
+      <div class="description">
+        This is a premium product with high performance and quality.
+      </div>
+
+      <iframe id="youtubeVideo" allowfullscreen></iframe>
+
+      <button class="add" onclick="addToCart()">Add to Cart</button>
+      <button class="buy" onclick="buyNow()">Buy Now</button>
+
+      <div class="discount-box">
+        <p>Discount Code:</p>
+        <input id="discountCode" placeholder="Enter code">
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+// ====== PRODUCT DATA ======
+const products = {
+  "BOT Trading EA": [
+    {name:"EA 0.01 TFM1", price:199, img:"ea.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+    {name:"EA 0.01 TFM5", price:199, img:"eamt5.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"}
+  ],
+  "Discord": [
+    {name:"Account Discrod 1 Month", price:10, img:"ac1m.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"}
+  ]
+};
+
+// ====== GET PARAMS ======
+const params = new URLSearchParams(window.location.search);
+const category = params.get("cat");
+const name = params.get("name");
+
+const product = products[category]?.find(p => p.name === name);
+
+if(product){
+  document.getElementById("productName").innerText = product.name;
+  document.getElementById("productPrice").innerText = "฿" + product.price;
+  document.getElementById("productImg").src = product.img;
+  document.getElementById("youtubeVideo").src = product.youtube;
+}
+
+function addToCart(){
+  alert("Added to cart 🛒");
+}
+
+function buyNow(){
+  alert("Proceed to payment 💳");
+}
+
+</script>
+
+</body>
+</html>
