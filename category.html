@@ -120,7 +120,7 @@ if(products[category]){
           <div style="padding:20px;">
         <h3>${p.name}</h3>
         <div class="price">฿${p.price}</div>
-        <button class="add" onclick="addToCart('${p.name}')">Add to Cart</button>
+        <button class="add"onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">Add to Cart</button>
         <button class="buy" onclick="viewProduct('${p.name}', '${category}')">View</button>
       </div>
       </div>
@@ -128,8 +128,19 @@ if(products[category]){
   });
 }
 
-function addToCart(name){
-  alert(name + " added to cart 🛒");
+function addToCart(name, price, img){
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  cart.push({
+    name: name,
+    price: price,
+    img: img
+  });
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  alert("เพิ่มสินค้าแล้ว 🛒");
 }
 function viewProduct(name, category){
   window.location.href =
