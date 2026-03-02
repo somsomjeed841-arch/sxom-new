@@ -1,150 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>Payment - SXOM JEXM</title>
-<style>
-  body {
-    background: #d8ccc2; /* ปรับสีให้เข้ากับธีมเดิมของคุณ */
-    color: #3e2f27;
-    font-family: 'Segoe UI', sans-serif;
-    text-align: center;
-    padding: 40px;
-  }
-  .card {
-    background: #f3eee9;
-    padding: 30px;
-    margin: 20px auto;
-    width: 350px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  }
-  .qr-img {
-    width: 220px;
-    border: 5px solid white;
-    border-radius: 10px;
-    margin: 15px 0;
-  }
-  input[type="file"] {
-    margin: 20px 0;
-    display: block;
-    width: 100%;
-  }
-  button {
-    background: #8c6b5a;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    width: 100%;
-    margin-top: 10px;
-  }
-  button:disabled { background: #ccc; }
-  .status { margin-top: 15px; font-weight: bold; font-size: 14px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Up - SXOM JEXM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #d8ccc2;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: #f3eee9;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(62, 47, 39, 0.15);
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #3e2f27;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #8c6b5a;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .qr-section {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .qr-img {
+            width: 200px;
+            height: 200px;
+            display: block;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+
+        .upload-area {
+            border: 2px dashed #d1c4bc;
+            border-radius: 20px;
+            padding: 25px;
+            background: #ede5df;
+            margin-bottom: 25px;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: #8c6b5a;
+            background: #e8ded6;
+        }
+
+        .upload-area p {
+            font-size: 13px;
+            color: #6b5548;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            font-size: 13px;
+            color: #3e2f27;
+            width: 100%;
+        }
+
+        .btn-verify {
+            background: #8c6b5a;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(140, 107, 90, 0.3);
+        }
+
+        .btn-verify:hover {
+            background: #3e2f27;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(62, 47, 39, 0.4);
+        }
+
+        .btn-verify:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            min-height: 20px;
+        }
+
+        .btn-back {
+            margin-top: 25px;
+            display: inline-block;
+            text-decoration: none;
+            color: #8c6b5a;
+            font-size: 13px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .btn-back:hover {
+            color: #3e2f27;
+            text-decoration: underline;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
 
-<h2>เติมเงินผ่าน QR Code (อัตโนมัติ)</h2>
+<div class="container">
+    <h2>เติมเงินอัตโนมัติ</h2>
+    <p class="subtitle">สแกน QR Code และอัปโหลดสลิปเพื่อรับยอดเงินทันที</p>
+    
+    <div class="qr-section">
+        <img src="promptpay.png" class="qr-img" alt="QR Code รับเงิน">
+    </div>
 
-<div class="card">
-  <p>1. สแกนจ่ายเงินตามต้องการ</p>
-  <img src="promptpay.png" class="qr-img" alt="QR Code รับเงิน">
-  
-  <p>2. อัปโหลดสลิปเพื่อยืนยัน</p>
-  <input type="file" id="slipInput" accept="image/*">
-  
-  <button id="uploadBtn" onclick="verifyAndTopup()">ตรวจสอบสลิปและเติมเงิน</button>
-  <div id="status" class="status"></div>
+    <div class="upload-area">
+        <p>เลือกไฟล์สลิปการโอนเงิน (JPG, PNG)</p>
+        <input type="file" id="slipInput" accept="image/*">
+    </div>
+
+    <button id="uploadBtn" class="btn-verify" onclick="verifyAndTopup()">
+        <span id="btnText">ตรวจสอบสลิปและเติมเงิน</span>
+        <div id="spinner" class="spinner"></div>
+    </button>
+    
+    <div id="status" class="status"></div>
+
+    <a href="shop.html" class="btn-back">← กลับหน้าหลัก</a>
 </div>
 
-<br>
-<button onclick="back()" style="background:none; color:#3e2f27; width:auto;">← กลับหน้าหลัก</button>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-  // 1. ตั้งค่า Firebase & Supabase (ดึงค่าจากโปรเจกต์เดิมของคุณ)
-  const firebaseConfig = { apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg", authDomain: "sxom-new.firebaseapp.com", projectId: "sxom-new" };
-  const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
-  
-  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  const auth = getAuth(initializeApp(firebaseConfig));
-  
-  let currentUserId = null;
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg", 
+        authDomain: "sxom-new.firebaseapp.com", 
+        projectId: "sxom-new" 
+    };
+    
+    const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
+    
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const auth = getAuth(initializeApp(firebaseConfig));
+    
+    let currentUserId = null;
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) currentUserId = user.uid;
-    else window.location.href = "index.html";
-  });
+    onAuthStateChanged(auth, (user) => {
+        if (user) currentUserId = user.uid;
+        else window.location.href = "index.html";
+    });
 
-  window.verifyAndTopup = async function() {
-    const fileInput = document.getElementById('slipInput');
-    const statusDiv = document.getElementById('status');
-    const btn = document.getElementById('uploadBtn');
+    window.verifyAndTopup = async function() {
+        const fileInput = document.getElementById('slipInput');
+        const statusDiv = document.getElementById('status');
+        const btn = document.getElementById('uploadBtn');
+        const btnText = document.getElementById('btnText');
+        const spinner = document.getElementById('spinner');
 
-    if (!fileInput.files[0]) return alert("กรุณาเลือกรูปสลิปก่อนครับ");
+        if (!fileInput.files[0]) return alert("กรุณาเลือกไฟล์รูปภาพสลิปครับ");
 
-    btn.disabled = true;
-    statusDiv.innerText = "กำลังตรวจสอบสลิปกับธนาคาร...";
-    statusDiv.style.color = "#3e2f27";
+        // UI Loading State
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        spinner.style.display = 'block';
+        statusDiv.innerText = "กำลังตรวจสอบกับธนาคาร...";
+        statusDiv.style.color = "#3e2f27";
 
-    const formData = new FormData();
-    formData.append('files', fileInput.files[0]);
+        const formData = new FormData();
+        formData.append('files', fileInput.files[0]);
 
-    try {
-      // 2. ส่งไปเช็คที่ SlipOK (ใส่ API Key ของคุณที่นี่)
-      const response = await fetch('https://api.slipok.com/api/v1/main/verify/', {
-        method: 'POST',
-        headers: { 'x-authorization': 'ใส่_API_KEY_SLIPOK_ตรงนี้' },
-        body: formData
-      });
+        try {
+            // ใส่ API Key ของ SlipOK ที่นี่
+            const response = await fetch('https://api.slipok.com/api/v1/main/verify/', {
+                method: 'POST',
+                headers: { 'x-authorization': 'ใส่_API_KEY_SLIPOK_ตรงนี้' },
+                body: formData
+            });
 
-      const result = await response.json();
+            const result = await response.json();
 
-      if (result.success) {
-        const topupAmount = result.data.amount; // ยอดเงินที่โอนมาจริงจากสลิป
+            if (result.success) {
+                const topupAmount = result.data.amount;
 
-        // 3. ดึงยอดเงินเดิมจาก Supabase
-        const { data: profile } = await _supabase
-          .from('profiles')
-          .select('balance')
-          .eq('id', currentUserId)
-          .single();
+                const { data: profile } = await _supabase
+                    .from('profiles')
+                    .select('balance')
+                    .eq('id', currentUserId)
+                    .single();
 
-        const newBalance = (profile.balance || 0) + topupAmount;
+                const newBalance = (profile.balance || 0) + topupAmount;
 
-        // 4. อัปเดตยอดเงินใหม่ลง Supabase
-        const { error } = await _supabase
-          .from('profiles')
-          .update({ balance: newBalance })
-          .eq('id', currentUserId);
+                await _supabase
+                    .from('profiles')
+                    .update({ balance: newBalance })
+                    .eq('id', currentUserId);
 
-        if (!error) {
-          statusDiv.style.color = "green";
-          statusDiv.innerText = `✅ สำเร็จ! เติมเงินเข้า ฿${topupAmount} เรียบร้อย`;
-          alert(`เติมเงินสำเร็จ ฿${topupAmount}! ระบบจะพาไปหน้าหลัก`);
-          window.location.href = "shop.html";
+                statusDiv.style.color = "#2ecc71";
+                statusDiv.innerHTML = `✅ สำเร็จ! ระบบเติมเงินเข้า <b>฿${topupAmount}</b> แล้ว`;
+                setTimeout(() => window.location.href = "shop.html", 2000);
+            } else {
+                statusDiv.style.color = "#e74c3c";
+                statusDiv.innerText = "❌ " + (result.message || "สลิปไม่ถูกต้อง");
+            }
+        } catch (err) {
+            statusDiv.style.color = "#e74c3c";
+            statusDiv.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+        } finally {
+            btn.disabled = false;
+            btnText.style.display = 'block';
+            spinner.style.display = 'none';
         }
-      } else {
-        statusDiv.style.color = "red";
-        statusDiv.innerText = "❌ สลิปไม่ถูกต้อง หรือถูกใช้ไปแล้ว";
-      }
-    } catch (err) {
-      console.error(err);
-      statusDiv.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อระบบ";
-    } finally {
-      btn.disabled = false;
     }
-  }
-
-  window.back = function() { window.location.href = "shop.html"; }
 </script>
 
 </body>
