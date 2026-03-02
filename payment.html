@@ -157,6 +157,20 @@ window.verifyAndTopup = async function() {
         btn.disabled = false;
     }
 }
+    async function getBalance() {
+    try {
+        const { data, error } = await _supabase
+            .from('profiles')
+            .select('balance')
+            .eq('id', currentUserId)
+            .maybeSingle();
+        
+        if (error || !data) return 0;
+        return Number(data.balance);
+    } catch (e) {
+        return 0;
+    }
+}
 </script>
 </body>
 </html>
