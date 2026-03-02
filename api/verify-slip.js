@@ -1,5 +1,7 @@
 import formidable from "formidable";
 import fs from "fs";
+import FormData from "form-data";
+import fetch from "node-fetch";
 
 export const config = {
   api: {
@@ -17,13 +19,13 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Upload error" });
     }
 
-    const file = files.files;
-
-    const formData = new FormData();
-    formData.append("files", fs.createReadStream(file.filepath));
-    formData.append("log", "true");
-
     try {
+
+      const file = files.files;
+
+      const formData = new FormData();
+      formData.append("files", fs.createReadStream(file.filepath));
+      formData.append("log", "true");
 
       const response = await fetch(
         "https://api.slipok.com/api/line/apikey/61738",
@@ -31,6 +33,7 @@ export default async function handler(req, res) {
           method: "POST",
           headers: {
             "x-authorization": process.env.SLIPOK_KEY,
+            ...formData.getHeaders(),
           },
           body: formData,
         }
