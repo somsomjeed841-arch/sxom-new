@@ -2,68 +2,149 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Payment</title>
-
+<title>Payment - SXOM JEXM</title>
 <style>
-body{
-  background:#111;
-  color:white;
-  font-family:sans-serif;
-  text-align:center;
-  padding:40px;
-}
-
-.card{
-  background:#1c1c1c;
-  padding:30px;
-  margin:20px auto;
-  width:300px;
-  border-radius:15px;
-  cursor:pointer;
-}
-
-.card:hover{
-  background:#2a2a2a;
-}
+  body {
+    background: #d8ccc2; /* ปรับสีให้เข้ากับธีมเดิมของคุณ */
+    color: #3e2f27;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    padding: 40px;
+  }
+  .card {
+    background: #f3eee9;
+    padding: 30px;
+    margin: 20px auto;
+    width: 350px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+  .qr-img {
+    width: 220px;
+    border: 5px solid white;
+    border-radius: 10px;
+    margin: 15px 0;
+  }
+  input[type="file"] {
+    margin: 20px 0;
+    display: block;
+    width: 100%;
+  }
+  button {
+    background: #8c6b5a;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 10px;
+  }
+  button:disabled { background: #ccc; }
+  .status { margin-top: 15px; font-weight: bold; font-size: 14px; }
 </style>
 </head>
 <body>
 
-<h2>เลือกช่องทางการเติมเงิน</h2>
+<h2>เติมเงินผ่าน QR Code (อัตโนมัติ)</h2>
 
-<div class="card" onclick="topup(100)">
-💳 TrueMoney Wallet
-</div>
-
-<div class="card" onclick="topup(200)">
-🏦 ธนาคาร
-</div>
-
-<div class="card" onclick="topup(300)">
-🎁 Voucher
+<div class="card">
+  <p>1. สแกนจ่ายเงินตามต้องการ</p>
+  <img src="promptpay.png" class="qr-img" alt="QR Code รับเงิน">
+  
+  <p>2. อัปโหลดสลิปเพื่อยืนยัน</p>
+  <input type="file" id="slipInput" accept="image/*">
+  
+  <button id="uploadBtn" onclick="verifyAndTopup()">ตรวจสอบสลิปและเติมเงิน</button>
+  <div id="status" class="status"></div>
 </div>
 
 <br>
-<button onclick="back()">← กลับ</button>
+<button onclick="back()" style="background:none; color:#3e2f27; width:auto;">← กลับหน้าหลัก</button>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
-function topup(amount){
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+  // 1. ตั้งค่า Firebase & Supabase (ดึงค่าจากโปรเจกต์เดิมของคุณ)
+  const firebaseConfig = { apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg", authDomain: "sxom-new.firebaseapp.com", projectId: "sxom-new" };
+  const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
+  
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const auth = getAuth(initializeApp(firebaseConfig));
+  
+  let currentUserId = null;
 
-  balance += amount;
+  onAuthStateChanged(auth, (user) => {
+    if (user) currentUserId = user.uid;
+    else window.location.href = "index.html";
+  });
 
-  localStorage.setItem("balance", balance);
+  window.verifyAndTopup = async function() {
+    const fileInput = document.getElementById('slipInput');
+    const statusDiv = document.getElementById('status');
+    const btn = document.getElementById('uploadBtn');
 
-  alert("เติมเงินสำเร็จ +฿" + amount);
+    if (!fileInput.files[0]) return alert("กรุณาเลือกรูปสลิปก่อนครับ");
 
-  window.location.href = "./dashboard.html";
-}
+    btn.disabled = true;
+    statusDiv.innerText = "กำลังตรวจสอบสลิปกับธนาคาร...";
+    statusDiv.style.color = "#3e2f27";
 
-function back(){
-  window.location.href = "./dashboard.html";
-}
+    const formData = new FormData();
+    formData.append('files', fileInput.files[0]);
+
+    try {
+      // 2. ส่งไปเช็คที่ SlipOK (ใส่ API Key ของคุณที่นี่)
+      const response = await fetch('https://api.slipok.com/api/v1/main/verify/', {
+        method: 'POST',
+        headers: { 'x-authorization': 'ใส่_API_KEY_SLIPOK_ตรงนี้' },
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const topupAmount = result.data.amount; // ยอดเงินที่โอนมาจริงจากสลิป
+
+        // 3. ดึงยอดเงินเดิมจาก Supabase
+        const { data: profile } = await _supabase
+          .from('profiles')
+          .select('balance')
+          .eq('id', currentUserId)
+          .single();
+
+        const newBalance = (profile.balance || 0) + topupAmount;
+
+        // 4. อัปเดตยอดเงินใหม่ลง Supabase
+        const { error } = await _supabase
+          .from('profiles')
+          .update({ balance: newBalance })
+          .eq('id', currentUserId);
+
+        if (!error) {
+          statusDiv.style.color = "green";
+          statusDiv.innerText = `✅ สำเร็จ! เติมเงินเข้า ฿${topupAmount} เรียบร้อย`;
+          alert(`เติมเงินสำเร็จ ฿${topupAmount}! ระบบจะพาไปหน้าหลัก`);
+          window.location.href = "shop.html";
+        }
+      } else {
+        statusDiv.style.color = "red";
+        statusDiv.innerText = "❌ สลิปไม่ถูกต้อง หรือถูกใช้ไปแล้ว";
+      }
+    } catch (err) {
+      console.error(err);
+      statusDiv.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อระบบ";
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  window.back = function() { window.location.href = "shop.html"; }
 </script>
 
 </body>
