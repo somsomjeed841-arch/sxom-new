@@ -55,22 +55,52 @@ body{
   <div id="cartItems"></div>
   <div class="total" id="totalPrice"></div>
   <button onclick="checkout()" style="
-margin-top:20px;
-padding:12px 20px;
-background:#3e2f27;
-color:white;
-border:none;
-border-radius:10px;
-cursor:pointer;
-">
-Checkout
-</button>
+    margin-top:20px;
+    padding:12px 20px;
+    background:#3e2f27;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+  ">
+  Checkout
+  </button>
 </div>
 
-<script>
+<script type="module">
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+/* 🔥 Firebase config (ใส่เหมือนใน payment.html) */
+const firebaseConfig = {
+  apiKey: "AIzaSyAjikaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+  authDomain: "sxom-new.firebaseapp.com",
+  projectId: "sxom-new"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+/* 🔥 Supabase */
+const SUPABASE_URL = "https://rjjtksrjbiifgffhefdt.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* 🔐 บังคับ login */
+let currentUser = null;
+
+onAuthStateChanged(auth, (user)=>{
+  if(!user){
+    window.location.href = "index.html";
+  } else {
+    currentUser = user;
+  }
+});
+
+/* 🛒 โหลดสินค้า */
 const cart = JSON.parse(localStorage.getItem("cart")) || [];
-
 const cartContainer = document.getElementById("cartItems");
 
 let total = 0;
@@ -78,88 +108,111 @@ let total = 0;
 if(cart.length === 0){
   cartContainer.innerHTML = "<p>Your cart is empty.</p>";
 }else{
-cart.forEach((item, index) => {
+  cart.forEach((item, index) => {
 
-  total += item.price * item.qty;
+    total += item.price * item.qty;
 
-  cartContainer.innerHTML += `
-    <div class="cart-item">
-      <img src="${item.img}">
-      <div style="flex:1;">
-        <h3>${item.name}</h3>
-        <div class="price">฿${item.price}</div>
-        <div>
-  <button onclick="decreaseQty(${index})">-</button>
-  <span style="margin:0 10px">${item.qty}</span>
-  <button onclick="increaseQty(${index})">+</button>
-</div>
+    cartContainer.innerHTML += `
+      <div class="cart-item">
+        <img src="${item.img}">
+        <div style="flex:1;">
+          <h3>${item.name}</h3>
+          <div class="price">฿${item.price}</div>
+          <div>
+            <button onclick="decreaseQty(${index})">-</button>
+            <span style="margin:0 10px">${item.qty}</span>
+            <button onclick="increaseQty(${index})">+</button>
+          </div>
+        </div>
+        <button onclick="removeItem(${index})"
+        style="background:#a94442;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;">
+        Remove</button>
       </div>
-      <button onclick="removeItem(${index})" style="
-        background:#a94442;
-        color:white;
-        border:none;
-        padding:8px 12px;
-        border-radius:8px;
-        cursor:pointer;
-      ">Remove</button>
-    </div>
-  `;
-});
+    `;
+  });
 
   document.getElementById("totalPrice").innerText =
     "Total: ฿" + total;
 }
-function removeItem(index){
 
+/* ปุ่มต้องผูกกับ window เพราะใช้ module */
+window.removeItem = function(index){
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
   cart.splice(index, 1);
-
   localStorage.setItem("cart", JSON.stringify(cart));
-
   location.reload();
-}
-  function increaseQty(index){
+};
+
+window.increaseQty = function(index){
   let cart = JSON.parse(localStorage.getItem("cart"));
   cart[index].qty += 1;
   localStorage.setItem("cart", JSON.stringify(cart));
   location.reload();
-}
+};
 
-function decreaseQty(index){
+window.decreaseQty = function(index){
   let cart = JSON.parse(localStorage.getItem("cart"));
   if(cart[index].qty > 1){
     cart[index].qty -= 1;
   }
   localStorage.setItem("cart", JSON.stringify(cart));
   location.reload();
-}
-  function checkout(){
+};
 
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+/* 🔥 Checkout */
+window.checkout = async function(){
 
-  let total = 0;
+  if(!currentUser){
+    alert("กรุณา Login ก่อน");
+    return;
+  }
 
-  cart.forEach(item=>{
-    total += item.price * item.qty;
-  });
+  if(cart.length === 0){
+    alert("ไม่มีสินค้า");
+    return;
+  }
 
-  if(balance < total){
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("balance")
+    .eq("id", currentUser.uid)
+    .single();
+
+  if(error || !profile){
+    alert("ดึงข้อมูลผู้ใช้ไม่สำเร็จ");
+    return;
+  }
+
+  if(profile.balance < total){
     alert("เงินไม่พอ ❌");
     return;
   }
 
-  balance -= total;
+  // หักเงิน
+  await supabase
+    .from("profiles")
+    .update({ balance: profile.balance - total })
+    .eq("id", currentUser.uid);
 
-  localStorage.setItem("balance", balance);
+  // บันทึก order
+  for(const item of cart){
+    await supabase.from("orders").insert([
+      {
+        user_id: currentUser.uid,
+        product_name: item.name,
+        price: item.price * item.qty,
+        status: "success"
+      }
+    ]);
+  }
+
   localStorage.removeItem("cart");
 
   alert("สั่งซื้อสำเร็จ ✅");
-
   window.location.href = "dashboard.html";
-}
+};
+
 </script>
-  
+
 </body>
 </html>
