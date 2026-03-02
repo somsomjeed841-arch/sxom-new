@@ -55,6 +55,7 @@ body{
   display:none;
   overflow:hidden;
   animation:fade .3s ease;
+  z-index: 1000;
 }
 
 .dropdown-header{
@@ -186,6 +187,8 @@ body{
   <div class="category-card" onclick="goCategory('Reshade')">Reshade</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut }
@@ -200,6 +203,11 @@ const firebaseConfig = {
   appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
 };
 
+// ตั้งค่า Supabase
+const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -208,14 +216,27 @@ onAuthStateChanged(auth, (user)=>{
     window.location.href = "index.html";
   }else{
     document.getElementById("userEmail").innerText = user.email;
-    loadBalance();
+    loadBalance(user.uid); // ส่ง UID ไปเพื่อดึงยอดเงิน
   }
 });
 
-function loadBalance(){
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
-  document.getElementById("balance").innerText =
-    "฿" + balance.toLocaleString();
+// แก้ไขฟังก์ชันดึงเงินให้ดึงจาก Supabase
+async function loadBalance(userId){
+  try {
+    const { data, error } = await _supabase
+      .from('profiles')
+      .select('balance')
+      .eq('id', userId)
+      .single();
+
+    if (data) {
+      document.getElementById("balance").innerText = "฿" + data.balance.toLocaleString();
+    } else {
+      document.getElementById("balance").innerText = "฿0";
+    }
+  } catch (err) {
+    console.error("Error loading balance:", err);
+  }
 }
 
 window.toggleMenu = function(){
