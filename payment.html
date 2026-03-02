@@ -105,7 +105,7 @@ window.verifyAndTopup = async function() {
 
     try {
         // แก้ไข: ใช้ URL สำหรับ Client-side (ผ่าน Proxy ของ SlipOK) เพื่อแก้ปัญหา Failed to fetch
-        const slipOkApiUrl = 'https://api.slipok.com/api/v1/main/verify/';
+        const slipOkApiUrl = 'https://api.slipok.com/api/line/apikey/61738';
 
         const response = await fetch(slipOkApiUrl, {
             method: 'POST',
