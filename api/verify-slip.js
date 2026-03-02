@@ -21,7 +21,11 @@ module.exports = async function handler(req, res) {
 
     try {
 
-      const file = files.files;
+      const file = files.files?.[0];
+
+      if (!file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
 
       const formData = new FormData();
       formData.append("files", fs.createReadStream(file.filepath));
