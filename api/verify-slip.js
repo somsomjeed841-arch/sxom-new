@@ -1,7 +1,7 @@
-import formidable from "formidable";
-import fs from "fs";
-import FormData from "form-data";
-import fetch from "node-fetch";
+const formidable = require("formidable");
+const fs = require("fs");
+const FormData = require("form-data");
+const fetch = require("node-fetch");
 
 export const config = {
   api: {
@@ -9,7 +9,7 @@ export const config = {
   },
 };
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
 
   const form = new formidable.IncomingForm();
 
@@ -47,4 +47,4 @@ export default async function handler(req, res) {
     }
 
   });
-}
+};
