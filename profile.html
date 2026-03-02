@@ -102,11 +102,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script type="module">
-    // 2. นำเข้า Firebase Library
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-    // ตั้งค่า Firebase (ของคุณ)
+    // 🔥 Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
         authDomain: "sxom-new.firebaseapp.com",
@@ -119,50 +119,71 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ตั้งค่า Supabase (ของคุณ)
+    // 🔥 Supabase Config
     const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ตรวจสอบการ Login
-    onAuthStateChanged(auth, (user) => {
+    // 🔥 ตรวจสอบ Login
+    onAuthStateChanged(auth, async (user) => {
+
+        console.log("Firebase user:", user);
+
         if (user) {
-            // แสดงข้อมูลจาก Firebase
+
             document.getElementById("email").innerText = user.email;
             document.getElementById("uid").innerText = user.uid;
-            
-            // ดึงยอดเงินจาก Supabase โดยใช้ UID ของคนที่ Login อยู่
+
+            // ✅ สร้างโปรไฟล์ถ้ายังไม่มี
+            const { error: upsertError } = await _supabase
+                .from('profiles')
+                .upsert({
+                    id: user.uid,
+                    email: user.email
+                });
+
+            if (upsertError) {
+                console.error("Supabase upsert error:", upsertError);
+                return;
+            }
+
+            console.log("Profile ensured in database");
+
+            // โหลด balance
             loadBalance(user.uid);
+
         } else {
-            // ถ้าไม่ Login ให้กลับหน้าแรก
             window.location.href = "/index.html";
         }
     });
 
-    // ฟังก์ชันดึงยอดเงินจริงจากฐานข้อมูล
+    // 🔥 โหลด Balance
     async function loadBalance(userId) {
         try {
             const { data, error } = await _supabase
                 .from('profiles')
                 .select('balance')
                 .eq('id', userId)
-                .single();
+                .maybeSingle();
 
-            if (data) {
-                // อัปเดตตัวเลขเงินบนหน้าจอ
-                document.getElementById('display-balance').innerText = '฿' + data.balance.toLocaleString();
-            } else {
-                console.log("No profile found for this user in Supabase.");
-                document.getElementById('display-balance').innerText = '฿0';
+            if (error) {
+                console.error("Load balance error:", error);
+                return;
             }
+
+            const balance = data?.balance ?? 0;
+            document.getElementById('display-balance').innerText =
+                '฿' + Number(balance).toLocaleString();
+
         } catch (err) {
-            console.error("Error connecting to Supabase:", err);
+            console.error("Unexpected error:", err);
         }
     }
 
     window.goBack = function() {
         window.location.href = "/shop.html";
     }
+
 </script>
 
 </body>
