@@ -5,179 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Top Up - SXOM JEXM</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #d8ccc2; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        
+        .container { width: 100%; max-width: 450px; background: #f3eee9; padding: 30px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); text-align: center; }
+        
+        /* Tab Styling */
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; background: #ede5df; padding: 5px; border-radius: 15px; }
+        .tab { flex: 1; padding: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: 600; color: #8c6b5a; font-size: 14px; }
+        .tab.active { background: #8c6b5a; color: white; }
 
-        body {
-            background: #d8ccc2;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        .method-content { display: none; animation: fadeIn 0.4s ease; }
+        .method-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .container {
-            width: 100%;
-            max-width: 450px;
-            background: #f3eee9;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(62, 47, 39, 0.15);
-            text-align: center;
-            animation: fadeIn 0.6s ease-out;
-        }
+        .qr-section { background: white; padding: 15px; border-radius: 20px; display: inline-block; margin: 15px 0; }
+        .qr-img { width: 180px; height: 180px; object-fit: contain; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .upload-area { border: 2px dashed #d1c4bc; border-radius: 20px; padding: 20px; background: #ede5df; margin: 20px 0; }
+        
+        .btn-verify { background: #8c6b5a; color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-verify:hover { background: #3e2f27; transform: translateY(-2px); }
+        .btn-verify:disabled { background: #ccc; }
 
-        h2 {
-            color: #3e2f27;
-            margin-bottom: 8px;
-            font-size: 24px;
-        }
-
-        .subtitle {
-            color: #8c6b5a;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .qr-section {
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-bottom: 25px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-        }
-
-        .qr-img {
-            width: 200px;
-            height: 200px;
-            display: block;
-            border-radius: 10px;
-            object-fit: contain;
-        }
-
-        .upload-area {
-            border: 2px dashed #d1c4bc;
-            border-radius: 20px;
-            padding: 25px;
-            background: #ede5df;
-            margin-bottom: 25px;
-            transition: 0.3s;
-            position: relative;
-        }
-
-        .upload-area:hover {
-            border-color: #8c6b5a;
-            background: #e8ded6;
-        }
-
-        .upload-area p {
-            font-size: 13px;
-            color: #6b5548;
-            margin-bottom: 10px;
-        }
-
-        input[type="file"] {
-            font-size: 13px;
-            color: #3e2f27;
-            width: 100%;
-        }
-
-        .btn-verify {
-            background: #8c6b5a;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 15px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(140, 107, 90, 0.3);
-        }
-
-        .btn-verify:hover {
-            background: #3e2f27;
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px rgba(62, 47, 39, 0.4);
-        }
-
-        .btn-verify:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .status {
-            margin-top: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            min-height: 20px;
-        }
-
-        .btn-back {
-            margin-top: 25px;
-            display: inline-block;
-            text-decoration: none;
-            color: #8c6b5a;
-            font-size: 13px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-
-        .btn-back:hover {
-            color: #3e2f27;
-            text-decoration: underline;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        .status { margin-top: 15px; font-size: 14px; font-weight: 500; }
+        .btn-back { margin-top: 20px; display: inline-block; text-decoration: none; color: #8c6b5a; font-size: 13px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>เติมเงินอัตโนมัติ</h2>
-    <p class="subtitle">สแกน QR Code และอัปโหลดสลิปเพื่อรับยอดเงินทันที</p>
-    
-    <div class="qr-section">
-        <img src="กห.png" class="qr-img" alt="QR Code รับเงิน">
+    <h2>เติมเงินเข้าระบบ</h2>
+    <p style="color:#8c6b5a; font-size:13px; margin-bottom:20px;">เลือกช่องทางที่สะดวกและอัปโหลดสลิป</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('bank')">🏦 ธนาคาร</div>
+        <div class="tab" onclick="switchTab('wallet')">💳 TrueMoney</div>
+    </div>
+
+    <div id="bank-content" class="method-content active">
+        <div class="qr-section">
+            <img src="กห.png" class="qr-img" alt="Bank QR">
+        </div>
+        <p style="font-size:13px;">สแกนจ่ายผ่านแอปธนาคารได้ทุกแอป</p>
+    </div>
+
+    <div id="wallet-content" class="method-content">
+        <div class="qr-section" style="border: 2px solid #ff6000;">
+            <img src="wallet-qr.png" class="qr-img" alt="Wallet QR">
+        </div>
+        <p style="font-size:13px; color:#ff6000;">โอนเข้าเบอร์: <b>0xx-xxx-xxxx</b><br>หรือสแกน QR ผ่านแอป TrueMoney</p>
     </div>
 
     <div class="upload-area">
-        <p>เลือกไฟล์สลิปการโอนเงิน (JPG, PNG)</p>
+        <p style="font-size:13px; margin-bottom:10px;">อัปโหลดรูปภาพสลิป</p>
         <input type="file" id="slipInput" accept="image/*">
     </div>
 
-    <button id="uploadBtn" class="btn-verify" onclick="verifyAndTopup()">
-        <span id="btnText">ตรวจสอบสลิปและเติมเงิน</span>
-        <div id="spinner" class="spinner"></div>
-    </button>
-    
+    <button id="uploadBtn" class="btn-verify" onclick="verifyAndTopup()">ตรวจสอบสลิปอัตโนมัติ</button>
     <div id="status" class="status"></div>
 
     <a href="shop.html" class="btn-back">← กลับหน้าหลัก</a>
@@ -185,49 +70,45 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
+    // --- ตั้งค่าเหมือนเดิมของคุณ ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-
-    const firebaseConfig = { 
-        apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg", 
-        authDomain: "sxom-new.firebaseapp.com", 
-        projectId: "sxom-new" 
-    };
     
+    const firebaseConfig = { apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg", authDomain: "sxom-new.firebaseapp.com", projectId: "sxom-new" };
     const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
     
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const auth = getAuth(initializeApp(firebaseConfig));
-    
     let currentUserId = null;
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) currentUserId = user.uid;
-        else window.location.href = "index.html";
-    });
+    onAuthStateChanged(auth, (user) => { if (user) currentUserId = user.uid; else window.location.href="index.html"; });
 
+    // ฟังก์ชันสลับ Tab
+    window.switchTab = function(method) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.method-content').forEach(c => c.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
+        document.getElementById(method + '-content').classList.add('active');
+    }
+
+    // ฟังก์ชันตรวจสอบสลิป (ใช้ API เดียวกัน)
     window.verifyAndTopup = async function() {
         const fileInput = document.getElementById('slipInput');
         const statusDiv = document.getElementById('status');
         const btn = document.getElementById('uploadBtn');
-        const btnText = document.getElementById('btnText');
-        const spinner = document.getElementById('spinner');
 
-        if (!fileInput.files[0]) return alert("กรุณาเลือกไฟล์รูปภาพสลิปครับ");
+        if (!fileInput.files[0]) return alert("กรุณาเลือกไฟล์สลิปครับ");
 
-        // UI Loading State
         btn.disabled = true;
-        btnText.style.display = 'none';
-        spinner.style.display = 'block';
-        statusDiv.innerText = "กำลังตรวจสอบกับธนาคาร...";
+        statusDiv.innerText = "กำลังตรวจสอบสลิป...";
         statusDiv.style.color = "#3e2f27";
 
         const formData = new FormData();
         formData.append('files', fileInput.files[0]);
 
         try {
-            // ใส่ API Key ของ SlipOK ที่นี่
             const response = await fetch('https://api.slipok.com/api/v1/main/verify/', {
                 method: 'POST',
                 headers: { 'x-authorization': 'SLIPOK0IHUY7U' },
@@ -237,38 +118,25 @@
             const result = await response.json();
 
             if (result.success) {
-                const topupAmount = result.data.amount;
+                const amount = result.data.amount;
+                const { data: profile } = await _supabase.from('profiles').select('balance').eq('id', currentUserId).single();
+                const newBalance = (profile.balance || 0) + amount;
 
-                const { data: profile } = await _supabase
-                    .from('profiles')
-                    .select('balance')
-                    .eq('id', currentUserId)
-                    .single();
+                await _supabase.from('profiles').update({ balance: newBalance }).eq('id', currentUserId);
 
-                const newBalance = (profile.balance || 0) + topupAmount;
-
-                await _supabase
-                    .from('profiles')
-                    .update({ balance: newBalance })
-                    .eq('id', currentUserId);
-
-                statusDiv.style.color = "#2ecc71";
-                statusDiv.innerHTML = `✅ สำเร็จ! ระบบเติมเงินเข้า <b>฿${topupAmount}</b> แล้ว`;
-                setTimeout(() => window.location.href = "shop.html", 2000);
+                statusDiv.style.color = "green";
+                statusDiv.innerText = `✅ เติมเงินสำเร็จ ฿${amount}`;
+                setTimeout(() => window.location.href="shop.html", 1500);
             } else {
-                statusDiv.style.color = "#e74c3c";
-                statusDiv.innerText = "❌ " + (result.message || "สลิปไม่ถูกต้อง");
+                statusDiv.style.color = "red";
+                statusDiv.innerText = "❌ สลิปไม่ถูกต้อง หรือใช้ไปแล้ว";
             }
         } catch (err) {
-            statusDiv.style.color = "#e74c3c";
             statusDiv.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
         } finally {
             btn.disabled = false;
-            btnText.style.display = 'block';
-            spinner.style.display = 'none';
         }
     }
 </script>
-
 </body>
 </html>
