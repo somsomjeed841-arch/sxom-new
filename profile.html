@@ -57,11 +57,14 @@
             border-radius: 10px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         .info span {
             font-weight: bold;
             color: #8c6b5a;
+            word-break: break-all;
+            margin-left: 10px;
         }
 
         button {
@@ -97,11 +100,13 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script type="module">
+    // 2. นำเข้า Firebase Library
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-    // Firebase Config เดิมของคุณ
+    // ตั้งค่า Firebase (ของคุณ)
     const firebaseConfig = {
         apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
         authDomain: "sxom-new.firebaseapp.com",
@@ -114,27 +119,28 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Supabase Config
+    // ตั้งค่า Supabase (ของคุณ)
     const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ตรวจสอบสถานะการ Login
+    // ตรวจสอบการ Login
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            // แสดงข้อมูลจาก Firebase
             document.getElementById("email").innerText = user.email;
             document.getElementById("uid").innerText = user.uid;
             
-            // เมื่อ Login แล้ว ให้ดึงยอดเงินจาก Supabase โดยใช้ UID ของ Firebase
-            loadBalanceFromSupabase(user.uid);
+            // ดึงยอดเงินจาก Supabase โดยใช้ UID ของคนที่ Login อยู่
+            loadBalance(user.uid);
         } else {
-            // ถ้าไม่ได้ Login ให้เด้งไปหน้าแรก
+            // ถ้าไม่ Login ให้กลับหน้าแรก
             window.location.href = "/index.html";
         }
     });
 
-    // ฟังก์ชันดึงยอดเงินจาก Supabase
-    async function loadBalanceFromSupabase(userId) {
+    // ฟังก์ชันดึงยอดเงินจริงจากฐานข้อมูล
+    async function loadBalance(userId) {
         try {
             const { data, error } = await _supabase
                 .from('profiles')
@@ -143,13 +149,14 @@
                 .single();
 
             if (data) {
+                // อัปเดตตัวเลขเงินบนหน้าจอ
                 document.getElementById('display-balance').innerText = '฿' + data.balance.toLocaleString();
             } else {
-                console.log("ยังไม่มีข้อมูลในระบบ หรือ User ID ไม่ตรง");
-                document.getElementById('display-balance').innerText = '฿0 (ไม่พบข้อมูล)';
+                console.log("No profile found for this user in Supabase.");
+                document.getElementById('display-balance').innerText = '฿0';
             }
         } catch (err) {
-            console.error("Error loading balance:", err);
+            console.error("Error connecting to Supabase:", err);
         }
     }
 
