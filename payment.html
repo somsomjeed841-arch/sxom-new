@@ -7,28 +7,20 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #d8ccc2; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        
         .container { width: 100%; max-width: 450px; background: #f3eee9; padding: 30px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); text-align: center; }
-        
-        /* Tab Styling */
         .tabs { display: flex; gap: 10px; margin-bottom: 25px; background: #ede5df; padding: 5px; border-radius: 15px; }
         .tab { flex: 1; padding: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: 600; color: #8c6b5a; font-size: 14px; }
         .tab.active { background: #8c6b5a; color: white; }
-
         .method-content { display: none; animation: fadeIn 0.4s ease; }
         .method-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         .qr-section { background: white; padding: 15px; border-radius: 20px; display: inline-block; margin: 15px 0; }
         .qr-img { width: 180px; height: 180px; object-fit: contain; }
-
         .upload-area { border: 2px dashed #d1c4bc; border-radius: 20px; padding: 20px; background: #ede5df; margin: 20px 0; }
-        
         .btn-verify { background: #8c6b5a; color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; }
         .btn-verify:hover { background: #3e2f27; transform: translateY(-2px); }
         .btn-verify:disabled { background: #ccc; }
-
-        .status { margin-top: 15px; font-size: 14px; font-weight: 500; }
+        .status { margin-top: 15px; font-size: 14px; font-weight: 500; min-height: 20px; }
         .btn-back { margin-top: 20px; display: inline-block; text-decoration: none; color: #8c6b5a; font-size: 13px; }
     </style>
 </head>
@@ -54,7 +46,7 @@
         <div class="qr-section" style="border: 2px solid #ff6000;">
             <img src="IMG_0517.png" class="qr-img" alt="Wallet QR">
         </div>
-        <p style="font-size:13px; color:#ff6000;"สแกน QR ผ่านแอป TrueMoney</p>
+        <p style="font-size:13px; color:#ff6000;">สแกน QR ผ่านแอป TrueMoney</p>
     </div>
 
     <div class="upload-area">
@@ -68,109 +60,101 @@
     <a href="shop.html" class="btn-back">← กลับหน้าหลัก</a>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
-    // --- ตั้งค่าเหมือนเดิมของคุณ ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-    
-    const firebaseConfig = { apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg", authDomain: "sxom-new.firebaseapp.com", projectId: "sxom-new" };
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg", 
+        authDomain: "sxom-new.firebaseapp.com", 
+        projectId: "sxom-new" 
+    };
     const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
     
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     const auth = getAuth(initializeApp(firebaseConfig));
-    let currentUserId = null;
 
-    onAuthStateChanged(auth, (user) => { if (user) currentUserId = user.uid; else window.location.href="index.html"; });
+    onAuthStateChanged(auth, (user) => { 
+        if (!user) window.location.href="index.html"; 
+    });
 
-    // ฟังก์ชันสลับ Tab
     window.switchTab = function(method) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.method-content').forEach(c => c.classList.remove('active'));
-        
         event.currentTarget.classList.add('active');
         document.getElementById(method + '-content').classList.add('active');
     }
 
-    // ฟังก์ชันตรวจสอบสลิป (ใช้ API เดียวกัน)
-window.verifyAndTopup = async function() {
-    const fileInput = document.getElementById('slipInput');
-    const statusDiv = document.getElementById('status');
-    const btn = document.getElementById('uploadBtn');
+    window.verifyAndTopup = async function() {
+        const fileInput = document.getElementById('slipInput');
+        const statusDiv = document.getElementById('status');
+        const btn = document.getElementById('uploadBtn');
 
-    if (!fileInput.files[0]) return alert("กรุณาเลือกไฟล์สลิปครับ");
+        if (!fileInput.files[0]) return alert("กรุณาเลือกไฟล์สลิปครับ");
+        if (!auth.currentUser) return alert("กรุณารอระบบโหลดข้อมูลผู้ใช้สักครู่");
 
-    btn.disabled = true;
-    statusDiv.style.color = "#3e2f27";
-    statusDiv.innerText = "กำลังตรวจสอบสลิปผ่านระบบ Proxy...";
+        btn.disabled = true;
+        statusDiv.style.color = "#3e2f27";
+        statusDiv.innerText = "กำลังตรวจสอบสลิปผ่านระบบ Proxy...";
 
-    const formData = new FormData();
-    formData.append('files', fileInput.files[0]);
-    formData.append('log', 'true'); 
+        const formData = new FormData();
+        formData.append('files', fileInput.files[0]);
+        formData.append('log', 'true'); 
 
-    try {
-        // ใช้ Proxy เพื่อแก้ปัญหา Failed to fetch (CORS)
-        const proxyUrl = 'https://api.allorigins.win/raw?url=';
-        const slipOkUrl = 'https://api.slipok.com/api/v1/main/verify/';
+        try {
+            const proxyUrl = 'https://api.allorigins.win/raw?url=';
+            const slipOkUrl = 'https://api.slipok.com/api/v1/main/verify/';
 
-        const response = await fetch(proxyUrl + encodeURIComponent(slipOkUrl), {
-            method: 'POST',
-            headers: { 
-                'x-authorization': 'SLIPOK0IHUY7U' // API Key ของคุณจากรูป image_1685ff.png
-            },
-            body: formData
-        });
+            const response = await fetch(proxyUrl + encodeURIComponent(slipOkUrl), {
+                method: 'POST',
+                headers: { 'x-authorization': 'SLIPOK0IHUY7U' },
+                body: formData
+            });
 
-        if (!response.ok) throw new Error("การเชื่อมต่อผ่าน Proxy มีปัญหา");
+            const result = await response.json();
 
-        const result = await response.json();
+            if (result.success) {
+                const amount = result.data.amount;
+                const uid = auth.currentUser.uid;
 
-        if (result.success) {
-            const amount = result.data.amount;
-            const currentBalance = await getBalance();
-            const newBalance = Number(currentBalance) + Number(amount);
+                // 1. ดึงยอดเงินปัจจุบันจาก Supabase
+                const { data: profile } = await _supabase
+                    .from('profiles')
+                    .select('balance')
+                    .eq('id', uid)
+                    .maybeSingle();
 
-            // อัปเดตข้อมูลลง Supabase (อ้างอิงตารางที่คุณสร้างใหม่ใน image_167dc3.png)
-            const { error: updateError } = await _supabase
-                .from('profiles')
-                .upsert({ 
-                    id: currentUserId, 
-                    balance: newBalance,
-                    email: auth.currentUser ? auth.currentUser.email : 'unknown'
-                }, { onConflict: 'id' });
+                const oldBalance = profile ? Number(profile.balance) : 0;
+                const newBalance = oldBalance + Number(amount);
 
-            if (updateError) throw updateError;
+                // 2. อัปเดตยอดเงินใหม่ (Upsert)
+                const { error: updateError } = await _supabase
+                    .from('profiles')
+                    .upsert({ 
+                        id: uid, 
+                        balance: newBalance,
+                        email: auth.currentUser.email 
+                    });
 
-            statusDiv.style.color = "green";
-            statusDiv.innerText = `✅ เติมเงินสำเร็จ ฿${amount}`;
-            setTimeout(() => window.location.href="shop.html", 2000);
-        } else {
+                if (updateError) throw updateError;
+
+                statusDiv.style.color = "green";
+                statusDiv.innerText = `✅ เติมเงินสำเร็จ ฿${amount}`;
+                setTimeout(() => window.location.href="shop.html", 2000);
+            } else {
+                statusDiv.style.color = "red";
+                statusDiv.innerText = "❌ " + (result.message || "สลิปไม่ถูกต้อง หรือถูกใช้ไปแล้ว");
+            }
+        } catch (err) {
+            console.error(err);
             statusDiv.style.color = "red";
-            statusDiv.innerText = "❌ " + (result.message || "สลิปไม่ถูกต้อง หรือถูกใช้ไปแล้ว");
+            statusDiv.innerText = "เกิดข้อผิดพลาด: " + err.message;
+        } finally {
+            btn.disabled = false;
         }
-    } catch (err) {
-        console.error("Full Error:", err);
-        statusDiv.style.color = "red";
-        statusDiv.innerText = "เกิดข้อผิดพลาด: " + err.message;
-    } finally {
-        btn.disabled = false;
     }
-}
-    async function getBalance() {
-    try {
-        const { data, error } = await _supabase
-            .from('profiles')
-            .select('balance')
-            .eq('id', currentUserId)
-            .maybeSingle();
-        
-        if (error || !data) return 0;
-        return Number(data.balance);
-    } catch (e) {
-        return 0;
-    }
-}
 </script>
 </body>
 </html>
