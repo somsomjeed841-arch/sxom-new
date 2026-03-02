@@ -125,36 +125,36 @@ window.goBack = function(){
 }
 </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // 1. ตั้งค่าการเชื่อมต่อ (เอาค่าที่เราจดไว้มาใส่ตรงนี้)
+  // 2. ข้อมูลการเชื่อมต่อของคุณ
   const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
-  const SUPABASE_KEY = 'YOUR_ANON_KEY_HERE'; // วางรหัสยาวๆ ที่คุณก๊อปมาตรงนี้
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // ใส่ Key ยาวๆ ที่คุณมีให้ครบ
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  async function loadUserData() {
-    // สมมติ ID ผู้ใช้ (ในอนาคตจะดึงจากการ Login)
-    const userId = "8af1krYyasZsFdCwtoG2CgJ9rb82"; 
+  async function updateMyBalance() {
+    const myId = "8af1krYyasZsFdCwtoG2CgJ9rb82";
 
-    // 2. ดึงข้อมูลจากตาราง profiles ที่เราสร้างไว้
-    const { data, error } = await supabase
+    // 3. ดึงข้อมูลยอดเงิน
+    const { data, error } = await _supabase
       .from('profiles')
       .select('balance')
-      .eq('id', userId)
+      .eq('id', myId)
       .single();
 
     if (data) {
-      // 3. เปลี่ยนตัวเลขบนหน้าจอให้ตรงกับในฐานข้อมูล
-      // แก้ไข ID ให้ตรงกับแท็กที่ใช้แสดงยอดเงินใน HTML ของคุณ
-      document.getElementById('user-balance').innerText = '฿' + data.balance;
-    } else {
-      console.log("ยังไม่มีข้อมูลเงิน หรือหา User ไม่เจอ");
+      // 4. แสดงผลบนหน้าเว็บ (หาจุดที่เขียนว่า Balance: ฿100 แล้วเปลี่ยน)
+      // สมมติว่าใน HTML คุณตั้ง id ให้ตัวเลขเงินว่า <span id="display-balance">
+      const balanceElement = document.getElementById('display-balance');
+      if (balanceElement) {
+          balanceElement.innerText = '฿' + data.balance.toLocaleString();
+      }
     }
   }
 
-  // รันคำสั่งทำงานทันทีที่เปิดหน้าเว็บ
-  loadUserData();
+  // เรียกใช้งานทันที
+  updateMyBalance();
 </script>
   
 </body>
