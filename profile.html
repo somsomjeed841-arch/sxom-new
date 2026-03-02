@@ -1,161 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>My Profile</title>
+    <meta charset="UTF-8">
+    <title>My Profile - SXOM JEXM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Segoe UI', sans-serif;
-}
+        body {
+            background: #d8ccc2;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-body{
-  background:#d8ccc2;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
+        .card {
+            width: 500px;
+            background: #f3eee9;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
 
-.card{
-  width:500px;
-  background:#f3eee9;
-  padding:40px;
-  border-radius:25px;
-  box-shadow:0 20px 40px rgba(0,0,0,0.2);
-  text-align:center;
-}
+        .profile-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px auto;
+            display: block;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
 
-.profile-logo{
-  width:100px;
-  height:100px;
-  border-radius:50%;
-  object-fit:cover;
-  margin:0 auto 20px auto;
-  display:block;
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
-}
+        h2 {
+            margin-bottom: 10px;
+            color: #3e2f27;
+        }
 
-h2{
-  margin-bottom:10px;
-  color:#3e2f27;
-}
+        .info {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 15px;
+            color: #3e2f27;
+        }
 
-.info{
-  margin-top:20px;
-  text-align:left;
-  font-size:15px;
-  color:#3e2f27;
-}
+        .info div {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #ede5df;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-.info div{
-  margin-bottom:12px;
-  padding:10px;
-  background:#ede5df;
-  border-radius:10px;
-}
+        .info span {
+            font-weight: bold;
+            color: #8c6b5a;
+        }
 
-button{
-  margin-top:25px;
-  padding:10px 20px;
-  border:none;
-  border-radius:10px;
-  background:#8c6b5a;
-  color:white;
-  cursor:pointer;
-  font-weight:600;
-}
-</style>
+        button {
+            margin-top: 25px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background: #8c6b5a;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #3e2f27;
+        }
+    </style>
 </head>
 <body>
 
 <div class="card">
-  <img src="logo.png" class="profile-logo">
-  <h2>My Profile</h2>
+    <img src="logo.png" class="profile-logo" alt="Logo">
+    <h2>My Profile</h2>
 
-  <div class="info">
-    <div>Email: <span id="email"></span></div>
-    <div>User ID: <span id="uid"></span></div>
-    <div>Balance: <span class="balance-display">฿0</span></div>
-  </div>
+    <div class="info">
+        <div>Email: <span id="email">Loading...</span></div>
+        <div>User ID: <span id="uid">Loading...</span></div>
+        <div>Balance: <span id="display-balance">฿0</span></div>
+    </div>
 
-  <button onclick="goBack()">Back to Shop</button>
+    <button onclick="goBack()">Back to Shop</button>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, onAuthStateChanged }
-from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-  authDomain: "sxom-new.firebaseapp.com",
-  projectId: "sxom-new",
-  storageBucket: "sxom-new.firebasestorage.app",
-  messagingSenderId: "832664032721",
-  appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-onAuthStateChanged(auth, (user)=>{
-  if (user) {
-    document.getElementById("email").innerText = user.email;
-    document.getElementById("uid").innerText = user.uid;
-    loadBalance();
-  } else {
-    window.location.href = "/index.html";
-  }
-});
-
-function loadBalance(){
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
-
-  document.querySelectorAll(".balance-display").forEach(el=>{
-    el.innerText = "฿" + balance.toLocaleString();
-  });
-}
-
-window.goBack = function(){
-  window.location.href = "/shop.html";
-}
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-<script>
-  // 2. ข้อมูลการเชื่อมต่อของคุณ
-  const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI'; // ใส่ Key ยาวๆ ที่คุณมีให้ครบ
-  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Firebase Config เดิมของคุณ
+    const firebaseConfig = {
+        apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+        authDomain: "sxom-new.firebaseapp.com",
+        projectId: "sxom-new",
+        storageBucket: "sxom-new.firebasestorage.app",
+        messagingSenderId: "832664032721",
+        appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
+    };
 
-  async function updateMyBalance() {
-    const myId = "8af1krYyasZsFdCwtoG2CgJ9rb82";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    // 3. ดึงข้อมูลยอดเงิน
-    const { data, error } = await _supabase
-      .from('profiles')
-      .select('balance')
-      .eq('id', myId)
-      .single();
+    // Supabase Config
+    const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    if (data) {
-      // 4. แสดงผลบนหน้าเว็บ (หาจุดที่เขียนว่า Balance: ฿100 แล้วเปลี่ยน)
-      // สมมติว่าใน HTML คุณตั้ง id ให้ตัวเลขเงินว่า <span id="display-balance">
-      const balanceElement = document.getElementById('display-balance');
-      if (balanceElement) {
-          balanceElement.innerText = '฿' + data.balance.toLocaleString();
-      }
+    // ตรวจสอบสถานะการ Login
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById("email").innerText = user.email;
+            document.getElementById("uid").innerText = user.uid;
+            
+            // เมื่อ Login แล้ว ให้ดึงยอดเงินจาก Supabase โดยใช้ UID ของ Firebase
+            loadBalanceFromSupabase(user.uid);
+        } else {
+            // ถ้าไม่ได้ Login ให้เด้งไปหน้าแรก
+            window.location.href = "/index.html";
+        }
+    });
+
+    // ฟังก์ชันดึงยอดเงินจาก Supabase
+    async function loadBalanceFromSupabase(userId) {
+        try {
+            const { data, error } = await _supabase
+                .from('profiles')
+                .select('balance')
+                .eq('id', userId)
+                .single();
+
+            if (data) {
+                document.getElementById('display-balance').innerText = '฿' + data.balance.toLocaleString();
+            } else {
+                console.log("ยังไม่มีข้อมูลในระบบ หรือ User ID ไม่ตรง");
+                document.getElementById('display-balance').innerText = '฿0 (ไม่พบข้อมูล)';
+            }
+        } catch (err) {
+            console.error("Error loading balance:", err);
+        }
     }
-  }
 
-  // เรียกใช้งานทันที
-  updateMyBalance();
+    window.goBack = function() {
+        window.location.href = "/shop.html";
+    }
 </script>
-  
+
 </body>
 </html>
