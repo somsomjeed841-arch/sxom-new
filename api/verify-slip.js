@@ -11,6 +11,10 @@ export const config = {
 
 module.exports = async function handler(req, res) {
 
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   const form = new formidable.IncomingForm();
 
   form.parse(req, async (err, fields, files) => {
@@ -21,11 +25,14 @@ module.exports = async function handler(req, res) {
 
     try {
 
-      const file = files.files?.[0];
+      // 🔥 ดึงไฟล์แบบกันพลาด 100%
+      const fileKey = Object.keys(files)[0];
 
-      if (!file) {
+      if (!fileKey) {
         return res.status(400).json({ error: "No file uploaded" });
       }
+
+      const file = files[fileKey][0];
 
       const formData = new FormData();
       formData.append("files", fs.createReadStream(file.filepath));
@@ -44,10 +51,11 @@ module.exports = async function handler(req, res) {
       );
 
       const data = await response.json();
-      res.status(200).json(data);
+
+      return res.status(200).json(data);
 
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
     }
 
   });
