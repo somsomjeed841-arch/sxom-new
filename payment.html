@@ -110,17 +110,19 @@ window.verifyAndTopup = async function() {
     formData.append('log', 'true'); 
 
     try {
-        // ใช้ AllOrigins Proxy เพื่อแก้ปัญหา Failed to fetch (CORS)
+        // ใช้ Proxy เพื่อแก้ปัญหา Failed to fetch (CORS)
         const proxyUrl = 'https://api.allorigins.win/raw?url=';
         const slipOkUrl = 'https://api.slipok.com/api/v1/main/verify/';
 
         const response = await fetch(proxyUrl + encodeURIComponent(slipOkUrl), {
             method: 'POST',
             headers: { 
-                'x-authorization': 'SLIPOK0IHUY7U' 
+                'x-authorization': 'SLIPOK0IHUY7U' // API Key ของคุณจากรูป image_1685ff.png
             },
             body: formData
         });
+
+        if (!response.ok) throw new Error("การเชื่อมต่อผ่าน Proxy มีปัญหา");
 
         const result = await response.json();
 
@@ -129,13 +131,14 @@ window.verifyAndTopup = async function() {
             const currentBalance = await getBalance();
             const newBalance = Number(currentBalance) + Number(amount);
 
+            // อัปเดตข้อมูลลง Supabase (อ้างอิงตารางที่คุณสร้างใหม่ใน image_167dc3.png)
             const { error: updateError } = await _supabase
                 .from('profiles')
                 .upsert({ 
                     id: currentUserId, 
                     balance: newBalance,
-                    email: auth.currentUser.email 
-                });
+                    email: auth.currentUser ? auth.currentUser.email : 'unknown'
+                }, { onConflict: 'id' });
 
             if (updateError) throw updateError;
 
@@ -144,10 +147,10 @@ window.verifyAndTopup = async function() {
             setTimeout(() => window.location.href="shop.html", 2000);
         } else {
             statusDiv.style.color = "red";
-            statusDiv.innerText = "❌ " + (result.message || "สลิปไม่ถูกต้อง");
+            statusDiv.innerText = "❌ " + (result.message || "สลิปไม่ถูกต้อง หรือถูกใช้ไปแล้ว");
         }
     } catch (err) {
-        console.error(err);
+        console.error("Full Error:", err);
         statusDiv.style.color = "red";
         statusDiv.innerText = "เกิดข้อผิดพลาด: " + err.message;
     } finally {
