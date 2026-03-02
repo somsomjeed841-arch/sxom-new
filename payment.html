@@ -97,29 +97,26 @@ window.verifyAndTopup = async function() {
 
     btn.disabled = true;
     statusDiv.style.color = "#3e2f27";
-    statusDiv.innerText = "กำลังส่งข้อมูลตรวจสอบสลิป...";
+    statusDiv.innerText = "กำลังตรวจสอบสลิป (อาจใช้เวลา 5-10 วินาที)...";
 
     const formData = new FormData();
     formData.append('files', fileInput.files[0]);
     formData.append('log', 'true'); 
 
     try {
-        // แก้ไข: ใช้ URL สำหรับ Client-side (ผ่าน Proxy ของ SlipOK) เพื่อแก้ปัญหา Failed to fetch
-        const slipOkApiUrl = 'https://api.slipok.com/api/line/apikey/61738';
+        // ใช้ Proxy ตัวนี้เพื่อข้ามปัญหา "Failed to fetch" (CORS)
+        const proxyUrl = 'https://corsproxy.io/?'; 
+        const targetUrl = 'https://api.slipok.com/api/line/apikey/61738';
 
-        const response = await fetch(slipOkApiUrl, {
+        const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
             method: 'POST',
             headers: { 
-                'x-authorization': 'SLIPOK0IHUY7U' // API Key ของคุณจากในรูป
+                'x-authorization': 'SLIPOK0IHUY7U' 
             },
             body: formData
         });
 
-        // ตรวจสอบว่า Response โอเคไหม
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Server Response: ${response.status}`);
-        }
+        if (!response.ok) throw new Error("การเชื่อมต่อเซิร์ฟเวอร์ผิดพลาด");
 
         const result = await response.json();
 
@@ -127,40 +124,31 @@ window.verifyAndTopup = async function() {
             const amount = result.data.amount;
             const uid = auth.currentUser.uid;
 
-            // 1. ดึงยอดเงินปัจจุบัน
-            const { data: profile } = await _supabase
-                .from('profiles')
-                .select('balance')
-                .eq('id', uid)
-                .maybeSingle();
-
+            // ดึงเงินเดิมและบวกเพิ่ม
+            const { data: profile } = await _supabase.from('profiles').select('balance').eq('id', uid).maybeSingle();
             const oldBalance = profile ? Number(profile.balance) : 0;
             const newBalance = oldBalance + Number(amount);
 
-            // 2. อัปเดตเงินใน Supabase
-            const { error: updateError } = await _supabase
-                .from('profiles')
-                .upsert({ 
-                    id: uid, 
-                    balance: newBalance,
-                    email: auth.currentUser.email,
-                    updated_at: new Date()
-                });
+            // บันทึกลง Supabase
+            const { error: updateError } = await _supabase.from('profiles').upsert({ 
+                id: uid, 
+                balance: newBalance,
+                email: auth.currentUser.email 
+            });
 
             if (updateError) throw updateError;
 
             statusDiv.style.color = "green";
-            statusDiv.innerText = `✅ สำเร็จ! ยอดเงินคงเหลือใหม่: ฿${newBalance}`;
-            setTimeout(() => window.location.href="shop.html", 2500);
+            statusDiv.innerText = `✅ สำเร็จ! เพิ่มเงิน ฿${amount} เรียบร้อย`;
+            setTimeout(() => window.location.href="shop.html", 2000);
         } else {
             statusDiv.style.color = "red";
-            statusDiv.innerText = "❌ " + (result.message || "สลิปไม่ถูกต้อง หรืออาจจะใช้ซ้ำ");
+            statusDiv.innerText = "❌ " + (result.message || "สลิปไม่ถูกต้อง หรือใช้ซ้ำแล้ว");
         }
     } catch (err) {
-        console.error("Error details:", err);
         statusDiv.style.color = "red";
-        // ถ้ายัง Failed to fetch ให้ตรวจสอบว่าเน็ตที่ใช้อยู่มีการบล็อก API หรือไม่
-        statusDiv.innerText = "เกิดข้อผิดพลาด: " + err.message;
+        statusDiv.innerText = "ข้อผิดพลาดระบบ: " + err.message;
+        console.error(err);
     } finally {
         btn.disabled = false;
     }
