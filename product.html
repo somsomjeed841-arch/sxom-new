@@ -26,18 +26,13 @@ body{
   flex-wrap:wrap;
 }
 
-.left{
-  flex:1;
-}
-
+.left{ flex:1; }
 .left img{
   width:100%;
   border-radius:20px;
 }
 
-.right{
-  flex:1;
-}
+.right{ flex:1; }
 
 .right h2{
   margin-bottom:15px;
@@ -83,6 +78,12 @@ button{
   border-radius:10px;
   cursor:pointer;
   margin-right:10px;
+  transition:0.2s;
+}
+
+button:hover{
+  opacity:0.85;
+  transform:translateY(-2px);
 }
 
 .add{
@@ -105,8 +106,59 @@ button{
   border:1px solid #d4c4b8;
   width:200px;
 }
+
+/* ===== MODAL ===== */
+
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content{
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  width:350px;
+  text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  animation:pop 0.2s ease;
+}
+
+.modal-buttons{
+  margin-top:20px;
+}
+
+.modal-buttons button{
+  padding:10px 20px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  margin:0 10px;
+}
+
+#confirmBuy{
+  background:#3e2f27;
+  color:white;
+}
+
+#cancelBuy{
+  background:#ccc;
+}
+
+@keyframes pop{
+  from{transform:scale(0.8); opacity:0;}
+  to{transform:scale(1); opacity:1;}
+}
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -120,10 +172,10 @@ button{
       <h2 id="productName"></h2>
       <div class="price" id="productPrice"></div>
 
-<div class="description">
-  <div class="description-title">PRODUCT DETAILS</div>
-  This is a premium product with high performance and quality.
-</div>
+      <div class="description">
+        <div class="description-title">PRODUCT DETAILS</div>
+        This is a premium product with high performance and quality.
+      </div>
 
       <iframe id="youtubeVideo" allowfullscreen></iframe>
 
@@ -134,43 +186,34 @@ button{
         <p>Discount Code:</p>
         <input id="discountCode" placeholder="Enter code">
       </div>
-
     </div>
+  </div>
+</div>
 
+<!-- MODAL -->
+<div id="buyModal" class="modal">
+  <div class="modal-content">
+    <h3>Confirm Purchase</h3>
+    <p id="confirmText"></p>
+    <div class="modal-buttons">
+      <button id="cancelBuy">Cancel</button>
+      <button id="confirmBuy">Confirm</button>
+    </div>
   </div>
 </div>
 
 <script>
-
 // ====== PRODUCT DATA ======
 const products = {
   "BOT Trading EA": [
     {name:"EA 0.01 TFM1", price:199, img:"ea.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
     {name:"EA 0.01 TFM5", price:199, img:"eamt5.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"}
-  ],
-   "Discord": [
-    {name:"Account Discrod 1 Month", price:10, img:"ac1m.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
-    {name:"Account Discrod 1 Year", price:10, img:"ac1y.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"}
-  ],
-  "Nitro": [
-    {name:"Discord Nitro 3 Month", price:59, img:"ni3m.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
-    {name:"Discord Nitro 1 Month", price:59, img:"ni1m.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"}
-  ],
-  "BOT Discord": [
-    {name:"Story BOT", price:199, img:"storybot.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
-    {name:"blacklist BOT", price:199, img:"bl.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"}
-  ],
-  "Reshade": [
-  {name:"SXOM V1", price:39, img:"vps1.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
-  {name:"SXOM V2", price:39, img:"vps2.PNG", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"}
-],
+  ]
 };
 
-// ====== GET PARAMS ======
 const params = new URLSearchParams(window.location.search);
 const category = params.get("cat");
 const name = params.get("name");
-
 const product = products[category]?.find(p => p.name === name);
 
 if(product){
@@ -181,27 +224,14 @@ if(product){
 }
 
 function addToCart(){
-
-  const item = {
-    name: product.name,
-    price: product.price,
-    img: product.img,
-    category: category,
-    qty:1
-  };
-
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-  cart.push(item);
-
+  cart.push({...product, category, qty:1});
   localStorage.setItem("cart", JSON.stringify(cart));
-
   alert("Added to cart 🛒");
 }
-
 </script>
-  
-    <script src="/env.js"></script>
+
+  <script src="/env.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
@@ -223,49 +253,44 @@ const supabase = createClient(
 
 let currentUser = null;
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    alert("กรุณาเข้าสู่ระบบก่อนซื้อสินค้า");
-    window.location.href = "/index.html";
-  } else {
-    currentUser = user;
-  }
+onAuthStateChanged(auth, (user)=>{
+  if(user){ currentUser = user; }
 });
 
-window.buyNow = async function(){
+const buyBtn = document.getElementById("buyBtn");
+const modal = document.getElementById("buyModal");
+const confirmText = document.getElementById("confirmText");
+const confirmBtn = document.getElementById("confirmBuy");
+const cancelBtn = document.getElementById("cancelBuy");
 
-  if(!currentUser) return;
+buyBtn.addEventListener("click", ()=>{
+  confirmText.innerText = `Confirm purchase of ${product.name} for ฿${product.price}?`;
+  modal.style.display = "flex";
+});
 
-  const confirmBuy = confirm(`ยืนยันการซื้อ ${product.name} ราคา ฿${product.price} ?`);
-  if(!confirmBuy) return;
+cancelBtn.onclick = ()=> modal.style.display = "none";
 
-  const { data: profile, error } = await supabase
+confirmBtn.onclick = async ()=>{
+  modal.style.display = "none";
+
+  const { data: profile } = await supabase
     .from("profiles")
     .select("balance")
     .eq("id", currentUser.uid)
     .single();
 
-  if(error){
-    alert("โหลดข้อมูลไม่สำเร็จ");
-    return;
-  }
+  const balance = Number(profile.balance ?? 0);
 
-  const currentBalance = Number(profile.balance ?? 0);
-
-  if(currentBalance < product.price){
+  if(balance < product.price){
     alert("ยอดเงินไม่เพียงพอ");
     return;
   }
 
-  const newBalance = currentBalance - product.price;
-
-  // หักเงิน
   await supabase
     .from("profiles")
-    .update({ balance: newBalance })
+    .update({ balance: balance - product.price })
     .eq("id", currentUser.uid);
 
-  // บันทึก order
   await supabase
     .from("orders")
     .insert([{
@@ -275,11 +300,9 @@ window.buyNow = async function(){
       status: "completed"
     }]);
 
-  alert("สั่งซื้อสำเร็จ ✅");
+  alert("Purchase successful ✅");
   window.location.href = "/profile.html";
 };
-  document.getElementById("buyBtn").addEventListener("click", buyNow);
-</script>
 </script>
 
 </body>
