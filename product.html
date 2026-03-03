@@ -128,7 +128,7 @@ button{
       <iframe id="youtubeVideo" allowfullscreen></iframe>
 
       <button class="add" onclick="addToCart()">Add to Cart</button>
-      <button class="buy" onclick="buyNow()">Buy Now</button>
+      <button class="buy" id="buyBtn">Buy Now</button>
 
       <div class="discount-box">
         <p>Discount Code:</p>
@@ -277,6 +277,7 @@ window.buyNow = async function(){
   alert("สั่งซื้อสำเร็จ ✅");
   window.location.href = "/profile.html";
 };
+  document.getElementById("buyBtn").addEventListener("click", buyNow);
 </script>
 </script>
 
