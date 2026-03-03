@@ -35,52 +35,93 @@ button:hover{background:#3e2f27;}
 <script src="/env.js"></script>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
+/* 🔥 Firebase Config */
 const firebaseConfig = {
-apiKey:"AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-authDomain:"sxom-new.firebaseapp.com",
-projectId:"sxom-new"
+  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+  authDomain: "sxom-new.firebaseapp.com",
+  projectId: "sxom-new"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+/* 🔥 Supabase */
+const supabase = createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_KEY
+);
 
-onAuthStateChanged(auth, async (user)=>{
+/* 🔐 เมื่อ auth เปลี่ยน */
+onAuthStateChanged(auth, async (user) => {
 
-if(!user){
-window.location.href="/index.html";
-return;
-}
+  if (!user) {
+    window.location.href = "/index.html";
+    return;
+  }
 
-document.getElementById("email").innerText=user.email;
-document.getElementById("uid").innerText=user.uid;
+  document.getElementById("email").innerText = user.email;
+  document.getElementById("uid").innerText = user.uid;
 
-// สร้างโปรไฟล์ถ้ายังไม่มี
-await supabase.from("profiles").upsert({
-id:user.uid,
-email:user.email
+  try {
+
+    /* 🔎 เช็คว่า profile มีไหม */
+    const { data: existingProfile, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.uid)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Profile check error:", error);
+      return;
+    }
+
+    /* 🆕 ถ้าไม่มี → สร้างใหม่ */
+    if (!existingProfile) {
+      const { error: insertError } = await supabase
+        .from("profiles")
+        .insert({
+          id: user.uid,
+          email: user.email,
+          balance: 0
+        });
+
+      if (insertError) {
+        console.error("Insert profile error:", insertError);
+        return;
+      }
+    }
+
+    /* 💰 โหลด balance */
+    const { data: profileData, error: balanceError } = await supabase
+      .from("profiles")
+      .select("balance")
+      .eq("id", user.uid)
+      .single();
+
+    if (balanceError) {
+      console.error("Balance load error:", balanceError);
+      return;
+    }
+
+    const balance = profileData?.balance ?? 0;
+
+    document.getElementById("display-balance").innerText =
+      "฿" + Number(balance).toLocaleString();
+
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  }
+
 });
 
-// โหลด balance
-const { data } = await supabase
-.from("profiles")
-.select("balance")
-.eq("id",user.uid)
-.single();
+window.goBack = () => window.location.href = "/shop.html";
 
-const balance=data?.balance??0;
-
-document.getElementById("display-balance").innerText=
-"฿"+Number(balance).toLocaleString();
-
-});
-
-window.goBack=()=>window.location.href="/shop.html";
 </script>
 
 </body>
