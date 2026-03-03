@@ -192,7 +192,7 @@ body{
   <script src="/env.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, singOut} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const firebaseConfig = {
@@ -230,7 +230,8 @@ async function loadBalance(userId){
       .single();
 
     if (data) {
-      document.getElementById("balance").innerText = "฿" + Numder(data.balance).toLocaleString();
+      document.getElementById("balance").innerText =
+        "฿" + Number(data.balance).toLocaleString();
     } else {
       document.getElementById("balance").innerText = "฿0";
     }
