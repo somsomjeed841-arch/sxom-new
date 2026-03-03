@@ -199,10 +199,85 @@ function addToCart(){
   alert("Added to cart 🛒");
 }
 
-function buyNow(){
-  alert("Proceed to payment 💳");
-}
+</script>
 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+  authDomain: "sxom-new.firebaseapp.com",
+  projectId: "sxom-new"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const supabase = createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_KEY
+);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    alert("กรุณาเข้าสู่ระบบก่อนซื้อสินค้า");
+    window.location.href = "/index.html";
+  } else {
+    currentUser = user;
+  }
+});
+
+window.buyNow = async function(){
+
+  if(!currentUser) return;
+
+  const confirmBuy = confirm(`ยืนยันการซื้อ ${product.name} ราคา ฿${product.price} ?`);
+  if(!confirmBuy) return;
+
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("balance")
+    .eq("id", currentUser.uid)
+    .single();
+
+  if(error){
+    alert("โหลดข้อมูลไม่สำเร็จ");
+    return;
+  }
+
+  const currentBalance = Number(profile.balance ?? 0);
+
+  if(currentBalance < product.price){
+    alert("ยอดเงินไม่เพียงพอ");
+    return;
+  }
+
+  const newBalance = currentBalance - product.price;
+
+  // หักเงิน
+  await supabase
+    .from("profiles")
+    .update({ balance: newBalance })
+    .eq("id", currentUser.uid);
+
+  // บันทึก order
+  await supabase
+    .from("orders")
+    .insert([{
+      user_id: currentUser.uid,
+      product_name: product.name,
+      price: product.price,
+      status: "completed"
+    }]);
+
+  alert("สั่งซื้อสำเร็จ ✅");
+  window.location.href = "/profile.html";
+};
+</script>
 </script>
 
 </body>
