@@ -1,157 +1,86 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>My Profile - SXOM JEXM</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<meta charset="UTF-8">
+<title>My Profile - SXOM JEXM</title>
 
-        body {
-            background: #d8ccc2;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .card {
-            width: 500px;
-            background: #f3eee9;
-            padding: 40px;
-            border-radius: 25px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-
-        .profile-logo {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 20px auto;
-            display: block;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        h2 {
-            margin-bottom: 10px;
-            color: #3e2f27;
-        }
-
-        .info {
-            margin-top: 20px;
-            text-align: left;
-            font-size: 15px;
-            color: #3e2f27;
-        }
-
-        .info div {
-            margin-bottom: 12px;
-            padding: 10px;
-            background: #ede5df;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .info span {
-            font-weight: bold;
-            color: #8c6b5a;
-            word-break: break-all;
-            margin-left: 10px;
-        }
-
-        button {
-            margin-top: 25px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            background: #8c6b5a;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #3e2f27;
-        }
-    </style>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background:#d8ccc2;height:100vh;display:flex;justify-content:center;align-items:center;}
+.card{width:500px;background:#f3eee9;padding:40px;border-radius:25px;box-shadow:0 20px 40px rgba(0,0,0,0.2);text-align:center;}
+.profile-logo{width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto 20px;display:block;box-shadow:0 10px 25px rgba(0,0,0,0.3);}
+h2{margin-bottom:10px;color:#3e2f27;}
+.info{margin-top:20px;text-align:left;font-size:15px;color:#3e2f27;}
+.info div{margin-bottom:12px;padding:10px;background:#ede5df;border-radius:10px;display:flex;justify-content:space-between;align-items:center;}
+.info span{font-weight:bold;color:#8c6b5a;word-break:break-all;margin-left:10px;}
+button{margin-top:25px;padding:10px 20px;border:none;border-radius:10px;background:#8c6b5a;color:white;cursor:pointer;font-weight:600;transition:.3s;}
+button:hover{background:#3e2f27;}
+</style>
 </head>
 <body>
 
 <div class="card">
-    <img src="logo.png" class="profile-logo" alt="Logo">
-    <h2>My Profile</h2>
+<img src="logo.png" class="profile-logo">
+<h2>My Profile</h2>
 
-    <div class="info">
-        <div>Email: <span id="email">Loading...</span></div>
-        <div>User ID: <span id="uid">Loading...</span></div>
-        <div>Balance: <span id="display-balance">฿0</span></div>
-    </div>
-
-    <button onclick="goBack()">Back to Shop</button>
+<div class="info">
+<div>Email: <span id="email">Loading...</span></div>
+<div>User ID: <span id="uid">Loading...</span></div>
+<div>Balance: <span id="display-balance">฿0</span></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<button onclick="goBack()">Back to Shop</button>
+</div>
 
-    <script src="/env.js"></script>
+<script src="/env.js"></script>
+
 <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const firebaseConfig = {
+apiKey:"AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+authDomain:"sxom-new.firebaseapp.com",
+projectId:"sxom-new"
+};
 
-    // 🔥 Firebase Config
-    const firebaseConfig = {
-        apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-        authDomain: "sxom-new.firebaseapp.com",
-        projectId: "sxom-new",
-    };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 
-    // 🔥 Supabase Config
- const SUPABASE_URL = window.SUPABASE_URL;
-const SUPABASE_KEY = window.SUPABASE_KEY;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    // 🔥 ตรวจสอบ Login
-    onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, async (user)=>{
 
-        if (user) {
-            window.location.href = "/index.html";
-                    return;
-            }
-        
-            document.getElementById("email").innerText = user.email;
-            document.getElementById("uid").innerText = user.uid;
+if(!user){
+window.location.href="/index.html";
+return;
+}
 
-            // ✅ สร้างโปรไฟล์ถ้ายังไม่มี
-            await supabase
-                .from('profiles')
-                .upsert({
-                    id: user.uid,
-                    email: user.email
-                });
-        
-    // 🔥 โหลด Balance
-            const balance = data?.balance ?? 0;
-            document.getElementById('display-balance').innerText =
-                '฿' + Number(balance).toLocaleString();
-    });
+document.getElementById("email").innerText=user.email;
+document.getElementById("uid").innerText=user.uid;
 
-    window.goBack = function() {
-        window.location.href = "/shop.html";
-    }
+// สร้างโปรไฟล์ถ้ายังไม่มี
+await supabase.from("profiles").upsert({
+id:user.uid,
+email:user.email
+});
 
+// โหลด balance
+const { data } = await supabase
+.from("profiles")
+.select("balance")
+.eq("id",user.uid)
+.single();
+
+const balance=data?.balance??0;
+
+document.getElementById("display-balance").innerText=
+"฿"+Number(balance).toLocaleString();
+
+});
+
+window.goBack=()=>window.location.href="/shop.html";
 </script>
 
 </body>
