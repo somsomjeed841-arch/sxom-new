@@ -191,9 +191,9 @@ body{
 
   <script src="/env.js"></script>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
@@ -207,7 +207,8 @@ const firebaseConfig = {
 // ตั้งค่า Supabase
 const SUPABASE_URL = window.SUPABASE_URL;
 const SUPABASE_KEY = window.SUPABASE_KEY;
-
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -222,22 +223,18 @@ onAuthStateChanged(auth, (user)=>{
 
 // แก้ไขฟังก์ชันดึงเงินให้ดึงจาก Supabase
 async function loadBalance(userId){
-  try {
-    const { data, error } = const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { data, error } = await supabase
       .from('profiles')
       .select('balance')
       .eq('id', userId)
       .single();
 
     if (data) {
-      document.getElementById("balance").innerText = "฿" + data.balance.toLocaleString();
+      document.getElementById("balance").innerText = "฿" + Numder(data.balance).toLocaleString();
     } else {
       document.getElementById("balance").innerText = "฿0";
     }
-  } catch (err) {
-    console.error("Error loading balance:", err);
   }
-}
 
 window.toggleMenu = function(){
   const menu = document.getElementById("menu");
