@@ -66,65 +66,63 @@
 <h2>📦 ประวัติการสั่งซื้อ</h2>
 <div id="orders"></div>
 
-<script> src="/evn.js"></script>
-<script> type="module">
+<script src="/env.js"></script>
+<script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-// 🔥 Firebase
 const firebaseConfig = {
-apiKey:"AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-authDomain:"sxom-new.firebaseapp.com",
-projectId:"sxom-new"
+  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+  authDomain: "sxom-new.firebaseapp.com",
+  projectId: "sxom-new"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 🔥 Supabase
 const SUPABASE_URL = window.SUPABASE_URL;
 const SUPABASE_KEY = window.SUPABASE_KEY;
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 onAuthStateChanged(auth, async (user) => {
 
-    if (!user) {
-      alert("กรุณา Login ก่อน");
-      window.location.href = "/";
-      return;
-    }
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
 
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("user_id", user.uid)
-      .order("created_at", { ascending: false });
+  const { data } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("user_id", user.uid)
+    .order("created_at", { ascending: false });
 
-      const ordersDiv = document.getElementById("orders");
+  const ordersDiv = document.getElementById("orders");
 
-    if (data.length === 0) {
-      ordersDiv.innerHTML = "<p>ยังไม่มีประวัติการซื้อ</p>";
-      return;
-    }
+  if (!data || data.length === 0) {
+    ordersDiv.innerHTML = "<p>ยังไม่มีประวัติการซื้อ</p>";
+    return;
+  }
 
-    data.forEach(order => {
-      const statusClass = 
-        order.status === "success" ? "success" : "pending";
+  data.forEach(order => {
+    const statusClass =
+      order.status === "success" ? "success" : "pending";
 
-      ordersDiv.innerHTML += `
-        <div class="card">
-          <div class="product">${order.product_name}</div>
-          <div class="price">฿${order.price}</div>
-          <div class="date">${new Date(order.created_at).toLocaleString()}</div>
-          <div class="status ${statusClass}">
-            ${order.status}
-          </div>
+    ordersDiv.innerHTML += `
+      <div class="card">
+        <div class="product">${order.product_name}</div>
+        <div class="price">฿${order.price}</div>
+        <div class="date">${new Date(order.created_at).toLocaleString()}</div>
+        <div class="status ${statusClass}">
+          ${order.status}
         </div>
-      `;
-    });
-
+      </div>
+    `;
   });
+
+});
 
 </script>
 
