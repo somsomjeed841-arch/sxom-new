@@ -135,7 +135,7 @@ const SUPABASE_KEY = window.SUPABASE_KEY;
             document.getElementById("uid").innerText = user.uid;
 
             // ✅ สร้างโปรไฟล์ถ้ายังไม่มี
-            const { error: upsertError } = await _supabase
+            const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
                 .from('profiles')
                 .upsert({
                     id: user.uid,
@@ -160,7 +160,7 @@ const SUPABASE_KEY = window.SUPABASE_KEY;
     // 🔥 โหลด Balance
     async function loadBalance(userId) {
         try {
-            const { data, error } = await _supabase
+            const { data, error } = await supabase
                 .from('profiles')
                 .select('balance')
                 .eq('id', userId)
