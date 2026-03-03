@@ -218,7 +218,8 @@ const auth = getAuth(app);
 
 const supabase = createClient(
   window.SUPABASE_URL,
-  window.SUPABASE_KEY
+  window.SUPABASE_KEY,
+      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 );
 
 let currentUser = null;
