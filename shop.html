@@ -189,6 +189,7 @@ body{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <script src="/env.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut }
@@ -204,9 +205,8 @@ const firebaseConfig = {
 };
 
 // ตั้งค่า Supabase
-const SUPABASE_URL = 'https://rjjtksrjbiifgffhefdt.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI';
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = window.SUPABASE_URL;
+const SUPABASE_KEY = window.SUPABASE_KEY;
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
