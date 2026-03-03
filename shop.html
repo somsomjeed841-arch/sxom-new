@@ -223,7 +223,7 @@ onAuthStateChanged(auth, (user)=>{
 // แก้ไขฟังก์ชันดึงเงินให้ดึงจาก Supabase
 async function loadBalance(userId){
   try {
-    const { data, error } = await _supabase
+    const { data, error } = const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       .from('profiles')
       .select('balance')
       .eq('id', userId)
