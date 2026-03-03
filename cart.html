@@ -10,7 +10,6 @@ body{
   font-family:'Segoe UI', sans-serif;
   background:#d8ccc2;
 }
-
 .container{
   max-width:1000px;
   margin:60px auto;
@@ -19,7 +18,6 @@ body{
   border-radius:25px;
   box-shadow:0 20px 50px rgba(0,0,0,0.2);
 }
-
 .cart-item{
   display:flex;
   align-items:center;
@@ -29,22 +27,22 @@ body{
   background:white;
   border-radius:15px;
 }
-
 .cart-item img{
   width:120px;
   border-radius:10px;
 }
-
 .price{
   font-weight:600;
   color:#8c6b5a;
 }
-
 .total{
   text-align:right;
   font-size:20px;
   font-weight:600;
   margin-top:30px;
+}
+button{
+  cursor:pointer;
 }
 </style>
 </head>
@@ -61,22 +59,22 @@ body{
     color:white;
     border:none;
     border-radius:10px;
-    cursor:pointer;
   ">
   Checkout
   </button>
 </div>
 
-  <script src="/env.js"></script>
+<script src="/env.js"></script>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-/* 🔥 Firebase config (ใส่เหมือนใน payment.html) */
+/* ✅ Firebase (แก้ apiKey ถูกต้องแล้ว) */
 const firebaseConfig = {
-  apiKey: "AIzaSyAjikaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
   authDomain: "sxom-new.firebaseapp.com",
   projectId: "sxom-new"
 };
@@ -84,10 +82,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-/* 🔥 Supabase */
-const SUPABASE_URL = window.SUPABASE_URL;
-const SUPABASE_KEY = window.SUPABASE_KEY;
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+/* ✅ Supabase */
+const supabase = createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_KEY
+);
 
 /* 🔐 บังคับ login */
 let currentUser = null;
@@ -101,14 +100,20 @@ onAuthStateChanged(auth, (user)=>{
 });
 
 /* 🛒 โหลดสินค้า */
-const cart = JSON.parse(localStorage.getItem("cart")) || [];
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 const cartContainer = document.getElementById("cartItems");
-
 let total = 0;
 
-if(cart.length === 0){
-  cartContainer.innerHTML = "<p>Your cart is empty.</p>";
-}else{
+function renderCart(){
+  cartContainer.innerHTML = "";
+  total = 0;
+
+  if(cart.length === 0){
+    cartContainer.innerHTML = "<p>Your cart is empty.</p>";
+    document.getElementById("totalPrice").innerText = "";
+    return;
+  }
+
   cart.forEach((item, index) => {
 
     total += item.price * item.qty;
@@ -126,38 +131,37 @@ if(cart.length === 0){
           </div>
         </div>
         <button onclick="removeItem(${index})"
-        style="background:#a94442;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;">
+        style="background:#a94442;color:white;border:none;padding:8px 12px;border-radius:8px;">
         Remove</button>
       </div>
     `;
   });
 
   document.getElementById("totalPrice").innerText =
-    "Total: ฿" + total;
+    "Total: ฿" + total.toLocaleString();
 }
+
+renderCart();
 
 /* ปุ่มต้องผูกกับ window เพราะใช้ module */
 window.removeItem = function(index){
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
   cart.splice(index, 1);
   localStorage.setItem("cart", JSON.stringify(cart));
-  location.reload();
+  renderCart();
 };
 
 window.increaseQty = function(index){
-  let cart = JSON.parse(localStorage.getItem("cart"));
   cart[index].qty += 1;
   localStorage.setItem("cart", JSON.stringify(cart));
-  location.reload();
+  renderCart();
 };
 
 window.decreaseQty = function(index){
-  let cart = JSON.parse(localStorage.getItem("cart"));
   if(cart[index].qty > 1){
     cart[index].qty -= 1;
   }
   localStorage.setItem("cart", JSON.stringify(cart));
-  location.reload();
+  renderCart();
 };
 
 /* 🔥 Checkout */
@@ -210,7 +214,7 @@ window.checkout = async function(){
   localStorage.removeItem("cart");
 
   alert("สั่งซื้อสำเร็จ ✅");
-  window.location.href = "dashboard.html";
+  window.location.href = "shop.html";
 };
 
 </script>
