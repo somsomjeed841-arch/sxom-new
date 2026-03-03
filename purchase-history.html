@@ -75,10 +75,13 @@
 
   firebase.initializeApp(firebaseConfig);
 
-  const supabase = window.supabase.createClient(
-    "https://YOUR_PROJECT.supabase.co",
-    "YOUR_ANON_KEY"
-  );
+<script src="/env.js"></script>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = window.SUPABASE_URL;
+const SUPABASE_KEY = window.SUPABASE_KEY;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
   firebase.auth().onAuthStateChanged(async (user) => {
 
