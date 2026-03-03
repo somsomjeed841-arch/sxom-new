@@ -113,9 +113,6 @@
         apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
         authDomain: "sxom-new.firebaseapp.com",
         projectId: "sxom-new",
-        storageBucket: "sxom-new.firebasestorage.app",
-        messagingSenderId: "832664032721",
-        appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -149,11 +146,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
             const balance = data?.balance ?? 0;
             document.getElementById('display-balance').innerText =
                 '฿' + Number(balance).toLocaleString();
-
-        } catch (err) {
-            console.error("Unexpected error:", err);
-        }
-    }
+    });
 
     window.goBack = function() {
         window.location.href = "/shop.html";
