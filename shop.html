@@ -7,21 +7,118 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background:#d8ccc2;min-height:100vh;}
-.navbar{display:flex;justify-content:space-between;align-items:center;padding:20px 40px;}
-.logo{font-weight:700;font-size:20px;color:#3e2f27;}
-.profile{position:relative;cursor:pointer;}
-.avatar-img{width:45px;height:45px;border-radius:50%;object-fit:cover;box-shadow:0 5px 15px rgba(0,0,0,0.2);}
-.dropdown{position:absolute;right:0;top:55px;width:220px;background:#f3eee9;border-radius:15px;box-shadow:0 20px 40px rgba(0,0,0,0.2);display:none;overflow:hidden;}
-.dropdown-header{padding:15px;border-bottom:1px solid #e0d3c8;background:#ede5df;font-size:14px;}
-.dropdown-header p{margin-top:5px;font-size:13px;color:#6b5548;}
-.dropdown-item{padding:12px 15px;cursor:pointer;font-size:14px;}
-.dropdown-item:hover{background:#e5d8cf;}
-.logout{color:#a94442;font-weight:600;}
-.hero{display:flex;justify-content:center;margin-top:40px;}
-.hero-box{width:600px;padding:40px;border-radius:20px;background:#f3eee9;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.15);}
-.categories{display:flex;justify-content:center;gap:30px;margin-top:50px;flex-wrap:wrap;padding-bottom:60px;}
-.category-card{width:220px;height:150px;border-radius:18px;background:#f3eee9;display:flex;align-items:center;justify-content:center;font-weight:600;color:#3e2f27;cursor:pointer;transition:.3s;box-shadow:0 10px 25px rgba(0,0,0,0.15);}
-.category-card:hover{transform:translateY(-5px);}
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 40px;
+}
+
+.logo{
+font-weight:700;
+font-size:20px;
+color:#3e2f27;
+}
+
+.profile{
+position:relative;
+cursor:pointer;
+}
+
+.avatar-img{
+width:45px;
+height:45px;
+border-radius:50%;
+object-fit:cover;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+cursor:pointer;
+}
+
+.dropdown{
+position:absolute;
+right:0;
+top:55px;
+width:220px;
+background:#f3eee9;
+border-radius:15px;
+box-shadow:0 20px 40px rgba(0,0,0,0.2);
+display:none;
+overflow:hidden;
+z-index:1000;
+}
+
+.dropdown-header{
+padding:15px;
+border-bottom:1px solid #e0d3c8;
+background:#ede5df;
+font-size:14px;
+}
+
+.dropdown-header p{
+margin-top:5px;
+font-size:13px;
+color:#6b5548;
+}
+
+.dropdown-item{
+padding:12px 15px;
+cursor:pointer;
+font-size:14px;
+transition:.2s;
+}
+
+.dropdown-item:hover{
+background:#e5d8cf;
+}
+
+.logout{
+color:#a94442;
+font-weight:600;
+}
+
+.hero{
+display:flex;
+justify-content:center;
+margin-top:40px;
+}
+
+.hero-box{
+width:600px;
+padding:40px;
+border-radius:20px;
+background:#f3eee9;
+text-align:center;
+box-shadow:0 20px 40px rgba(0,0,0,0.15);
+}
+
+.categories{
+display:flex;
+justify-content:center;
+gap:30px;
+margin-top:50px;
+flex-wrap:wrap;
+padding-bottom:60px;
+}
+
+.category-card{
+width:220px;
+height:150px;
+border-radius:18px;
+background:#f3eee9;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:600;
+color:#3e2f27;
+cursor:pointer;
+transition:.3s;
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.category-card:hover{
+transform:translateY(-5px);
+}
 </style>
 </head>
 <body>
@@ -36,8 +133,10 @@ body{background:#d8ccc2;min-height:100vh;}
 <strong id="userEmail">User</strong>
 <p>Balance: <span id="balance">฿0</span></p>
 </div>
+
 <div class="dropdown-item" onclick="goProfile()">👤 My Profile</div>
 <div class="dropdown-item" onclick="goPayment()">💰 Top Up</div>
+<div class="dropdown-item" onclick="goCart()">🛒 My Cart</div>
 <div class="dropdown-item" onclick="goHistory()">📦 Purchase History</div>
 <div class="dropdown-item logout" onclick="logout()">🚪 Logout</div>
 </div>
@@ -49,6 +148,15 @@ body{background:#d8ccc2;min-height:100vh;}
 <h1>Welcome to SXOM JEXM</h1>
 <p>Discover premium products curated just for you</p>
 </div>
+</div>
+
+<!-- 🔥 หมวดหมู่ครบเหมือนเดิม -->
+<div class="categories">
+<div class="category-card" onclick="goCategory('BOT Trading EA')">BOT Trading EA</div>
+<div class="category-card" onclick="goCategory('Discord')">Discord</div>
+<div class="category-card" onclick="goCategory('Nitro')">Nitro</div>
+<div class="category-card" onclick="goCategory('BOT Discord')">BOT Discord</div>
+<div class="category-card" onclick="goCategory('Reshade')">Reshade</div>
 </div>
 
 <script src="/env.js"></script>
@@ -73,6 +181,7 @@ if(!user){
 window.location.href="index.html";
 return;
 }
+
 document.getElementById("userEmail").innerText=user.email;
 loadBalance(user.uid);
 });
@@ -85,6 +194,7 @@ const {data}=await supabase
 .single();
 
 const balance=data?.balance??0;
+
 document.getElementById("balance").innerText=
 "฿"+Number(balance).toLocaleString();
 }
@@ -96,7 +206,9 @@ menu.style.display=menu.style.display==="block"?"none":"block";
 
 window.goProfile=()=>window.location.href="profile.html";
 window.goPayment=()=>window.location.href="payment.html";
+window.goCart=()=>window.location.href="cart.html";
 window.goHistory=()=>window.location.href="purchase-history.html";
+window.goCategory=(cat)=>window.location.href="category.html?cat="+encodeURIComponent(cat);
 
 window.logout=async()=>{
 await signOut(auth);
