@@ -67,23 +67,29 @@
 <div id="orders"></div>
 
 <script>
-
-  const firebaseConfig = {
-apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-        authDomain: "sxom-new.firebaseapp.com",
-  };
-
-  firebase.initializeApp(firebaseConfig);
-
-<script src="/env.js"></script>
-<script type="module">
+  
+<script> src="/evn.js"></script>
+<script> type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
+// 🔥 Firebase
+const firebaseConfig = {
+apiKey:"AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
+authDomain:"sxom-new.firebaseapp.com",
+projectId:"sxom-new"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// 🔥 Supabase
 const SUPABASE_URL = window.SUPABASE_URL;
 const SUPABASE_KEY = window.SUPABASE_KEY;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  firebase.auth().onAuthStateChanged(async (user) => {
+onAuthStateChanged(auth, async (user) => {
 
     if (!user) {
       alert("กรุณา Login ก่อน");
@@ -97,12 +103,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       .eq("user_id", user.uid)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.log(error);
-      return;
-    }
-
-    const ordersDiv = document.getElementById("orders");
+      const ordersDiv = document.getElementById("orders");
 
     if (data.length === 0) {
       ordersDiv.innerHTML = "<p>ยังไม่มีประวัติการซื้อ</p>";
@@ -110,8 +111,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     }
 
     data.forEach(order => {
-
-      const statusClass = order.status === "success" ? "success" : "pending";
+      const statusClass = 
+        order.status === "success" ? "success" : "pending";
 
       ordersDiv.innerHTML += `
         <div class="card">
