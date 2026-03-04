@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
     "formidable": "^3.5.0",
     "form-data": "^4.0.0",
     "node-fetch": "^2.6.7"
