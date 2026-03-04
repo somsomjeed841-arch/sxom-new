@@ -38,7 +38,7 @@ module.exports = async function handler(req, res) {
       slipForm.append("log", "true")
 
       const slipResponse = await fetch(
-        `https://api.slipok.com/api/line/apikey/${process.env.SLIPOK_KEY}`,
+        `https://api.slipok.com/api/line/apikey/61738}`,
         {
           method: "POST",
           body: slipForm,
