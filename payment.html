@@ -101,6 +101,7 @@ status.innerText="กำลังตรวจสอบ...";
 const formData=new FormData();
 formData.append("files",fileInput.files[0]);
 formData.append("log","true");
+formData.append("uid", auth.currentUser.uid); // ส่ง uid ไปให้ server
 
 try{
 
@@ -109,74 +110,27 @@ method: "POST",
 body: formData
 });
 
-if(!response.ok) throw new Error("เชื่อมต่อ SlipOK ไม่สำเร็จ");
-
 const result=await response.json();
-console.log("SlipOK:",result);
 
 if(result.success){
 
-const amount=Number(result.data.amount);
-const transactionId=result.data.transaction_id;
-const uid=auth.currentUser.uid;
-
-/* 🔒 กันสลิปซ้ำ */
-const { data: existing } = await supabase
-.from("topups")
-.select("id")
-.eq("transaction_id", transactionId)
-.maybeSingle();
-
-if(existing){
-status.style.color="red";
-status.innerText="❌ สลิปนี้ถูกใช้ไปแล้ว";
-btn.disabled=false;
-return;
-}
-
-/* 💰 ดึงยอดเดิม */
-const {data:profile,error:selectError}=await supabase
-.from("profiles")
-.select("balance")
-.eq("id",uid)
-.maybeSingle();
-
-if(selectError) throw selectError;
-
-const oldBalance=profile?.balance?Number(profile.balance):0;
-const newBalance=oldBalance+amount;
-
-/* 💰 อัปเดต balance */
-const {error:updateError}=await supabase
-.from("profiles")
-.update({balance:newBalance})
-.eq("id",uid);
-
-if(updateError) throw updateError;
-
-/* 🧾 บันทึกประวัติ topup */
-await supabase
-.from("topups")
-.insert([{
-user_id:uid,
-amount:amount,
-transaction_id:transactionId
-}]);
-
 status.style.color="green";
-status.innerText=`✅ เติมเงิน ฿${amount} สำเร็จ`;
-
+status.innerText="✅ เติมเงินสำเร็จ";
 setTimeout(()=>window.location.href="profile.html",2000);
 
 }else{
+
 status.style.color="red";
-status.innerText="❌ สลิปไม่ถูกต้อง";
+status.innerText=result.message || "❌ สลิปไม่ถูกต้อง";
+
 }
 
 }catch(err){
+
 console.error(err);
 status.style.color="red";
 status.innerText="เกิดข้อผิดพลาด: "+err.message;
+
 }
 
 btn.disabled=false;
