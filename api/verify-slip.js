@@ -1,5 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
+
 export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
@@ -8,30 +14,44 @@ export default async function handler(req, res) {
 
   try {
 
-    const formData = req.body
+    // 🔥 ใช้ formData จาก request โดยตรง
+    const formData = await req.formData()
 
-    // เรียก SlipOK
-    const slipResponse = await fetch("https://api.slipok.com/api/line/apikey/61738", {
-      method: "POST",
-      body: formData
-    })
+    const uid = formData.get("uid")
+    const file = formData.get("files")
+
+    if (!uid || !file) {
+      return res.status(400).json({ success:false, message:"Missing data" })
+    }
+
+    // ส่งไป SlipOK
+    const slipForm = new FormData()
+    slipForm.append("files", file)
+    slipForm.append("log", "true")
+
+    const slipResponse = await fetch(
+      `https://api.slipok.com/api/line/apikey/${process.env.SLIPOK_KEY}`,
+      {
+        method: "POST",
+        body: slipForm
+      }
+    )
 
     const result = await slipResponse.json()
 
     if (!result.success) {
-      return res.status(400).json({ success: false })
+      return res.status(400).json({ success:false })
     }
 
     const amount = Number(result.data.amount)
     const transactionId = result.data.transaction_id
-    const uid = req.body.uid
 
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
 
-    // 🔒 เช็คสลิปซ้ำ
+    // 🔒 กันสลิปซ้ำ
     const { data: existing } = await supabase
       .from("topups")
       .select("id")
@@ -39,10 +59,10 @@ export default async function handler(req, res) {
       .maybeSingle()
 
     if (existing) {
-      return res.status(400).json({ success: false, message: "Slip already used" })
+      return res.status(400).json({ success:false, message:"Slip already used" })
     }
 
-    // 🔥 ดึง balance เดิม
+    // 💰 ดึงยอดเดิม
     const { data: profile } = await supabase
       .from("profiles")
       .select("balance")
@@ -52,13 +72,13 @@ export default async function handler(req, res) {
     const oldBalance = profile?.balance || 0
     const newBalance = oldBalance + amount
 
-    // 💰 อัปเดต balance
+    // อัปเดต balance
     await supabase
       .from("profiles")
       .update({ balance: newBalance })
       .eq("id", uid)
 
-    // 🧾 บันทึก topup
+    // บันทึก topup
     await supabase
       .from("topups")
       .insert([{
@@ -67,10 +87,12 @@ export default async function handler(req, res) {
         transaction_id: transactionId
       }])
 
-    return res.status(200).json({ success: true })
+    return res.status(200).json({ success:true })
 
   } catch (err) {
+
     console.error(err)
-    return res.status(500).json({ error: 'Server error' })
+    return res.status(500).json({ error: err.message })
+
   }
 }
