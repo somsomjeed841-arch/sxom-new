@@ -4,13 +4,11 @@ const fs = require('fs')
 const FormData = require('form-data')
 const fetch = require('node-fetch')
 
-export const config = {
+module.exports.config = {
   api: {
     bodyParser: false,
   },
 }
-
-module.exports = async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
