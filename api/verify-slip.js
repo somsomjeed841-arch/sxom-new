@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
     const amount = Number(result.data.amount)
     const transactionId = result.data.transaction_id
-    const uid = result.data.receiver?.account?.name // หรือดึงจาก client header แทน (เดี๋ยวอธิบายต่อ)
+    const uid = req.body.uid
 
     const supabase = createClient(
       process.env.SUPABASE_URL,
