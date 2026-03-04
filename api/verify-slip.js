@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const formData = req.body
 
     // เรียก SlipOK
-    const slipResponse = await fetch("https://api.slipok.com/api/line/apikey/YOUR_API_KEY", {
+    const slipResponse = await fetch("https://api.slipok.com/api/line/apikey/61738", {
       method: "POST",
       body: formData
     })
