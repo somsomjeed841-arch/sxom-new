@@ -27,14 +27,14 @@ module.exports = async function handler(req, res) {
       }
 
       const uid = fields.uid
-      const file = files.files
+      const file = files.file   // ✅ แก้ตรงนี้
 
       if (!uid || !file) {
         return res.status(400).json({ error: 'Missing data' })
       }
 
       const slipForm = new FormData()
-      slipForm.append("files", fs.createReadStream(file.filepath))
+      slipForm.append("file", fs.createReadStream(file.filepath)) // ✅ แก้ตรงนี้
       slipForm.append("log", "true")
 
       const slipResponse = await fetch(
@@ -48,8 +48,10 @@ module.exports = async function handler(req, res) {
 
       const result = await slipResponse.json()
 
+      console.log("SlipOK response:", result) // 🔥 เผื่อดู log
+
       if (!result.success) {
-        return res.status(400).json({ success:false })
+        return res.status(400).json({ success:false, message: result })
       }
 
       const amount = Number(result.data.amount)
