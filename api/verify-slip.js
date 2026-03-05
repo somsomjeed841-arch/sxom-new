@@ -4,10 +4,6 @@ const fs = require('fs')
 const FormData = require('form-data')
 const fetch = require('node-fetch')
 
-module.exports.config = {
-  api: { bodyParser: false },
-}
-
 module.exports = async function handler(req, res) {
 
   if (req.method !== 'POST') {
@@ -23,28 +19,21 @@ module.exports = async function handler(req, res) {
 
     try {
 
-      if (err) return res.status(500).json({ error: err.message })
-
-      console.log("FIELDS:", fields)
-      console.log("FILES:", files)
+      if (err) {
+        console.error(err)
+        return res.status(500).json({ error: 'Form parse error' })
+      }
 
       const uid = fields.uid?.[0] || fields.uid
 
-      // ✅ รองรับทุกเคสของ formidable
       let file = files.files || files.file || Object.values(files)[0]
-
       if (Array.isArray(file)) file = file[0]
 
       if (!uid || !file) {
         return res.status(400).json({ error: 'Missing data' })
       }
 
-      // 🔥 ตรงนี้สำคัญมาก
       const filePath = file.filepath || file.path
-
-      if (!filePath) {
-        return res.status(400).json({ error: 'File path missing' })
-      }
 
       const slipForm = new FormData()
       slipForm.append("files", fs.createReadStream(filePath))
@@ -59,29 +48,21 @@ module.exports = async function handler(req, res) {
       )
 
       const result = await slipResponse.json()
-
       console.log("SLIP RESULT:", result)
 
-      // ✅ กัน data หาย
       if (result.code !== 1000 || !result.data) {
-        return res.status(400).json({
-          message: "Slip invalid",
-          result
-        })
+        return res.status(400).json({ message: "Slip invalid" })
       }
 
-      const amount = Number(result.data.amount || 0)
+      const amount = Number(result.data.amount)
       const transactionId = result.data.transaction_id
-
-      if (!transactionId) {
-        return res.status(400).json({ message: "No transaction id" })
-      }
 
       const supabase = createClient(
         process.env.SUPABASE_URL,
         process.env.SUPABASE_SERVICE_ROLE_KEY
       )
 
+      // กันสลิปซ้ำ
       const { data: existing } = await supabase
         .from("topups")
         .select("id")
@@ -92,31 +73,22 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ message: "Slip already used" })
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("balance")
-        .eq("id", uid)
-        .single()
+      // ใช้ increment กันโกง race condition
+      await supabase.rpc('increment_balance', {
+        uid_input: uid,
+        amount_input: amount
+      })
 
-      const newBalance = (profile?.balance || 0) + amount
-
-      await supabase
-        .from("profiles")
-        .update({ balance: newBalance })
-        .eq("id", uid)
-
-      await supabase
-        .from("topups")
-        .insert([{
-          user_id: uid,
-          amount,
-          transaction_id: transactionId
-        }])
+      await supabase.from("topups").insert({
+        user_id: uid,
+        amount,
+        transaction_id: transactionId
+      })
 
       return res.status(200).json({ success: true })
 
     } catch (error) {
-      console.error("SERVER ERROR:", error)
+      console.error(error)
       return res.status(500).json({ error: error.message })
     }
 
