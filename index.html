@@ -114,14 +114,14 @@ Already have account?
 </div>
 
 </div>
-
+<script src="env.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
 const supabase = window.supabase.createClient(
-"https://uvbkeujfmzfhstxxpzvn.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YmtldWpmbXpmaHN0eHhwenZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzA5NTYsImV4cCI6MjA4ODMwNjk1Nn0.91HhGLdQO_DpBP5mX0u8kX7W79YElGvJvLDVcxBNkCY"
+window.SUPABASE_URL,
+window.SUPABASE_KEY
 )
 
 const loginBox = document.getElementById("loginBox")
