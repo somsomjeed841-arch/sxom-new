@@ -6,194 +6,194 @@
 
 <style>
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: 'Segoe UI', sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
 }
 
 body{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#d8ccc2;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#d8ccc2;
 }
 
-/* กล่องลอย */
 .card{
-  width:380px;
-  padding:40px;
-  border-radius:20px;
-  background:#f3eee9;
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.15),
-    inset 0 1px 0 rgba(255,255,255,0.6);
-  text-align:center;
-  position:relative;
-  animation:fadeIn .5s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(20px);}
-  to{opacity:1; transform:translateY(0);}
+width:380px;
+padding:40px;
+border-radius:20px;
+background:#f3eee9;
+box-shadow:
+0 20px 40px rgba(0,0,0,0.15),
+inset 0 1px 0 rgba(255,255,255,0.6);
+text-align:center;
 }
 
 h2{
-  margin-bottom:20px;
-  font-weight:600;
-  color:#3e2f27;
+margin-bottom:20px;
+font-weight:600;
+color:#3e2f27;
 }
 
 input{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border-radius:10px;
-  border:1px solid #d4c4b8;
-  background:#fff;
-  outline:none;
-  transition:.2s;
-}
-
-input:focus{
-  border-color:#8c6b5a;
-  box-shadow:0 0 0 3px rgba(140,107,90,0.15);
+width:100%;
+padding:12px;
+margin:8px 0;
+border-radius:10px;
+border:1px solid #d4c4b8;
+background:#fff;
+outline:none;
 }
 
 button{
-  width:100%;
-  padding:12px;
-  margin-top:15px;
-  border:none;
-  border-radius:10px;
-  background:#8c6b5a;
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-  transition:.2s;
-}
-
-button:hover{
-  transform:translateY(-2px);
-  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+background:#8c6b5a;
+color:white;
+font-weight:600;
+cursor:pointer;
 }
 
 .switch{
-  margin-top:15px;
-  font-size:14px;
+margin-top:15px;
+font-size:14px;
 }
 
 .switch span{
-  color:#8c6b5a;
-  cursor:pointer;
-  font-weight:600;
+color:#8c6b5a;
+cursor:pointer;
+font-weight:600;
 }
 
 .hidden{
-  display:none;
+display:none;
 }
 
 .error{
-  color:red;
-  font-size:13px;
-  margin-top:5px;
+color:red;
+font-size:13px;
+margin-top:5px;
 }
 </style>
 </head>
+
 <body>
 
 <div class="card">
 
-  <!-- LOGIN -->
-  <div id="loginBox">
-    <h2>Sign In</h2>
-    <input id="loginEmail" type="email" placeholder="Email" required>
-    <input id="loginPass" type="password" placeholder="Password" required>
-    <button onclick="login()">LOGIN</button>
-    <div class="switch">
-      Don't have an account? 
-      <span onclick="showRegister()">Create Account</span>
-    </div>
-  </div>
+<div id="loginBox">
+<h2>Sign In</h2>
+<input id="loginEmail" type="email" placeholder="Email">
+<input id="loginPass" type="password" placeholder="Password">
+<button onclick="login()">LOGIN</button>
 
-  <!-- REGISTER -->
-  <div id="registerBox" class="hidden">
-    <h2>Create Account</h2>
-    <input id="regEmail" type="email" placeholder="Email" required>
-    <input id="regPass" type="password" placeholder="Password" required>
-    <input id="regPass2" type="password" placeholder="Confirm Password" required>
-    <div id="passError" class="error"></div>
-    <button onclick="register()">REGISTER</button>
-    <div class="switch">
-      Already have an account? 
-      <span onclick="showLogin()">Sign In</span>
-    </div>
-  </div>
+<div class="switch">
+Don't have an account?
+<span onclick="showRegister()">Create Account</span>
+</div>
+</div>
+
+<div id="registerBox" class="hidden">
+<h2>Create Account</h2>
+<input id="regEmail" type="email" placeholder="Email">
+<input id="regPass" type="password" placeholder="Password">
+<input id="regPass2" type="password" placeholder="Confirm Password">
+
+<div id="passError" class="error"></div>
+
+<button onclick="register()">REGISTER</button>
+
+<div class="switch">
+Already have an account?
+<span onclick="showLogin()">Sign In</span>
+</div>
 
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword }
-from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+</div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-  authDomain: "sxom-new.firebaseapp.com",
-  projectId: "sxom-new",
-  storageBucket: "sxom-new.firebasestorage.app",
-  messagingSenderId: "832664032721",
-  appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
-};
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+<script>
 
-window.showRegister = function(){
-  loginBox.classList.add("hidden");
-  registerBox.classList.remove("hidden");
+const supabase = window.supabase.createClient(
+"https://uvbkeujfmzfhstxxpzvn.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YmtldWpmbXpmaHN0eHhwenZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzA5NTYsImV4cCI6MjA4ODMwNjk1Nn0.91HhGLdQO_DpBP5mX0u8kX7W79YElGvJvLDVcxBNkCY"
+)
+
+function showRegister(){
+loginBox.classList.add("hidden")
+registerBox.classList.remove("hidden")
 }
 
-window.showLogin = function(){
-  registerBox.classList.add("hidden");
-  loginBox.classList.remove("hidden");
+function showLogin(){
+registerBox.classList.add("hidden")
+loginBox.classList.remove("hidden")
 }
 
-// สมัคร
-window.register = async function(){
-  const email = regEmail.value;
-  const pass = regPass.value;
-  const pass2 = regPass2.value;
+async function register(){
 
-  if(pass !== pass2){
-    passError.innerText = "Passwords do not match";
-    return;
-  }
+const email = regEmail.value
+const pass = regPass.value
+const pass2 = regPass2.value
 
-  passError.innerText = "";
-
-  try{
-    await createUserWithEmailAndPassword(auth,email,pass);
-    alert("Account created successfully");
-    showLogin();
-  }catch(error){
-    alert(error.message);
-  }
+if(pass !== pass2){
+passError.innerText = "Passwords do not match"
+return
 }
 
-// ล็อกอิน
-window.login = async function(){
-  const email = loginEmail.value;
-  const pass = loginPass.value;
+passError.innerText = ""
 
-  try{
-    await signInWithEmailAndPassword(auth,email,pass);
-    window.location.href = "shop.html";
-  }catch(error){
-    alert(error.message);
-  }
+const { data, error } = await supabase.auth.signUp({
+email: email,
+password: pass
+})
+
+if(error){
+alert(error.message)
+return
 }
+
+await supabase.from("users").insert([
+{
+id: data.user.id,
+email: email,
+credit: 0
+}
+])
+
+alert("Account created successfully")
+
+showLogin()
+
+}
+
+async function login(){
+
+const email = loginEmail.value
+const pass = loginPass.value
+
+const { data, error } = await supabase.auth.signInWithPassword({
+email: email,
+password: pass
+})
+
+if(error){
+alert(error.message)
+return
+}
+
+localStorage.setItem("user",JSON.stringify(data.user))
+
+window.location.href = "shop.html"
+
+}
+
 </script>
 
 </body>
