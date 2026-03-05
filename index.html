@@ -9,7 +9,7 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:'Segoe UI',sans-serif;
+font-family: 'Segoe UI', sans-serif;
 }
 
 body{
@@ -25,15 +25,12 @@ width:380px;
 padding:40px;
 border-radius:20px;
 background:#f3eee9;
-box-shadow:
-0 20px 40px rgba(0,0,0,0.15),
-inset 0 1px 0 rgba(255,255,255,0.6);
+box-shadow:0 20px 40px rgba(0,0,0,0.15);
 text-align:center;
 }
 
 h2{
 margin-bottom:20px;
-font-weight:600;
 color:#3e2f27;
 }
 
@@ -43,14 +40,12 @@ padding:12px;
 margin:8px 0;
 border-radius:10px;
 border:1px solid #d4c4b8;
-background:#fff;
-outline:none;
 }
 
 button{
 width:100%;
 padding:12px;
-margin-top:15px;
+margin-top:10px;
 border:none;
 border-radius:10px;
 background:#8c6b5a;
@@ -88,18 +83,24 @@ margin-top:5px;
 
 <div id="loginBox">
 <h2>Sign In</h2>
+
 <input id="loginEmail" type="email" placeholder="Email">
 <input id="loginPass" type="password" placeholder="Password">
+
 <button onclick="login()">LOGIN</button>
 
 <div class="switch">
 Don't have an account?
 <span onclick="showRegister()">Create Account</span>
 </div>
+
 </div>
 
+
 <div id="registerBox" class="hidden">
+
 <h2>Create Account</h2>
+
 <input id="regEmail" type="email" placeholder="Email">
 <input id="regPass" type="password" placeholder="Password">
 <input id="regPass2" type="password" placeholder="Confirm Password">
@@ -117,45 +118,42 @@ Already have an account?
 
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
 const supabase = window.supabase.createClient(
 "https://uvbkeujfmzfhstxxpzvn.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YmtldWpmbXpmaHN0eHhwenZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzA5NTYsImV4cCI6MjA4ODMwNjk1Nn0.91HhGLdQO_DpBP5mX0u8kX7W79YElGvJvLDVcxBNkCY"
+"YOUR_ANON_KEY"
 )
 
-// DOM
 const loginBox = document.getElementById("loginBox")
 const registerBox = document.getElementById("registerBox")
 
 const regEmail = document.getElementById("regEmail")
 const regPass = document.getElementById("regPass")
 const regPass2 = document.getElementById("regPass2")
+const passError = document.getElementById("passError")
 
 const loginEmail = document.getElementById("loginEmail")
 const loginPass = document.getElementById("loginPass")
 
-const passError = document.getElementById("passError")
 
-function showRegister(){
+window.showRegister = function(){
 loginBox.classList.add("hidden")
 registerBox.classList.remove("hidden")
 }
 
-function showLogin(){
+window.showLogin = function(){
 registerBox.classList.add("hidden")
 loginBox.classList.remove("hidden")
 }
 
-async function register(){
 
-const email = regEmail.value
-const pass = regPass.value
-const pass2 = regPass2.value
+window.register = async function(){
 
-if(pass !== pass2){
+if(regPass.value !== regPass2.value){
 passError.innerText = "Passwords do not match"
 return
 }
@@ -163,8 +161,8 @@ return
 passError.innerText = ""
 
 const { data, error } = await supabase.auth.signUp({
-email: email,
-password: pass
+email: regEmail.value,
+password: regPass.value
 })
 
 if(error){
@@ -175,25 +173,23 @@ return
 await supabase.from("users").insert([
 {
 id: data.user.id,
-email: email,
+email: regEmail.value,
 credit: 0
 }
 ])
 
-alert("Account created successfully")
+alert("Account created")
 
 showLogin()
 
 }
 
-async function login(){
 
-const email = loginEmail.value
-const pass = loginPass.value
+window.login = async function(){
 
 const { data, error } = await supabase.auth.signInWithPassword({
-email: email,
-password: pass
+email: loginEmail.value,
+password: loginPass.value
 })
 
 if(error){
@@ -203,9 +199,11 @@ return
 
 localStorage.setItem("user",JSON.stringify(data.user))
 
-window.location.href = shop.html”
+window.location.href = "shop.html"
 
 }
-  </script>
+
+</script>
+
 </body>
 </html>
