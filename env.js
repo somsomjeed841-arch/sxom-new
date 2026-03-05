@@ -1,1 +1,2 @@
-
+window.SUPABASE_URL = "https://uvbkeujfmzfhstxxpzvn.supabase.co"
+window.SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YmtldWpmbXpmaHN0eHhwenZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzA5NTYsImV4cCI6MjA4ODMwNjk1Nn0.91HhGLdQO_DpBP5mX0u8kX7W79YElGvJvLDVcxBNkCY"
