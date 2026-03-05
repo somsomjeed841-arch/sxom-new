@@ -4,7 +4,7 @@ import fs from 'fs';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
 
-// สำคัญ: ปิด Body Parser ของ Vercel เพื่อให้ formidable จัดการไฟล์ได้
+// ปิด bodyParser เพื่อให้ formidable จัดการไฟล์ภาพได้
 export const config = {
   api: {
     bodyParser: false,
@@ -12,53 +12,54 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const form = formidable({});
 
   try {
-    // 1. รับค่าจากหน้าบ้าน (UID และ ไฟล์สลิป)
+    // 1. อ่านข้อมูลจากหน้าบ้าน (UID และ ไฟล์ภาพ)
     const [fields, files] = await form.parse(req);
     const uid = fields.uid?.[0]; 
-    const slipFile = files.files?.[0]; // ชื่อฟิลด์ "files" ตามใน payment.html
+    const slipFile = files.files?.[0]; 
 
     if (!uid || !slipFile) {
-      return res.status(400).json({ message: "กรุณาแนบสลิปหรือตรวจสอบการเข้าสู่ระบบ" });
+      return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน (ขาด UID หรือไฟล์สลิป)" });
     }
 
-    // 2. เตรียมส่งไฟล์ไปตรวจสอบที่ SlipOK
+    // 2. เตรียมข้อมูลส่งไปที่ SlipOK
     const slipFormData = new FormData();
     slipFormData.append('files', fs.createReadStream(slipFile.filepath));
     slipFormData.append('log', 'true');
 
+    // ดึง Key จาก Vercel (SLIPOK_KEY ที่คุณตั้งไว้คือ SLIPOK0IHUY7U)
+    const SLIPOK_API_KEY = process.env.SLIPOK_KEY;
+
     const slipResponse = await fetch("https://api.slipok.com/api/line/apikey/61738", {
       method: "POST",
       headers: {
-        "x-lib-apikey": process.env.SLIPOK_KEY // ใช้ค่าจาก Environment Variables ใน Vercel
+        "x-lib-apikey": SLIPOK_API_KEY // ✅ แก้ไข Header ให้ตรงตามที่ API ต้องการ
       },
       body: slipFormData
     });
 
     const result = await slipResponse.json();
 
-    // ตรวจสอบว่าสลิปถูกต้องหรือไม่
+    // เช็คผลลัพธ์จาก SlipOK
     if (!result.success) {
       return res.status(400).json({ message: result.message || "สลิปไม่ถูกต้อง" });
     }
 
-    // 3. ดึงข้อมูลจากสลิป (จำนวนเงิน และ รหัสอ้างอิง)
+    // 3. ดึงยอดเงินและรหัสอ้างอิง
     const amount = Number(result.data.amount);
     const transactionId = result.data.transRef || result.data.transaction_id;
 
-    // เชื่อมต่อ Supabase
+    // 4. เชื่อมต่อ Supabase (ใช้ Service Role Key เพื่อรัน RPC)
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    // 4. ป้องกันการใช้สลิปซ้ำ (ตรวจสอบในตาราง topups)
+    // 🔒 ป้องกันการใช้สลิปซ้ำ
     const { data: existing } = await supabase
       .from("topups")
       .select("id")
@@ -69,15 +70,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: "สลิปนี้ถูกใช้งานไปแล้ว" });
     }
 
-    // 5. เพิ่มเงินเข้าบัญชี (เรียกใช้ RPC: increment_balance ตามรูปที่ 7)
+    // 💰 อัปเดตยอดเงินในตาราง profiles (เรียก RPC ที่คุณสร้างไว้)
     const { error: rpcError } = await supabase.rpc("increment_balance", {
       uid_input: uid,
       amount_input: amount
     });
 
-    if (rpcError) throw new Error("ไม่สามารถอัปเดตยอดเงินได้: " + rpcError.message);
+    if (rpcError) throw new Error("Update balance failed: " + rpcError.message);
 
-    // 6. บันทึกประวัติการเติมเงิน
+    // 🧾 บันทึกประวัติลงตาราง topups
     await supabase.from("topups").insert({
       user_id: uid,
       amount: amount,
@@ -88,6 +89,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error("Critical Error:", err);
-    return res.status(500).json({ message: "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์: " + err.message });
+    return res.status(500).json({ message: "Server Error: " + err.message });
   }
 }
