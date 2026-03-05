@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     const slipResponse = await fetch("https://api.slipok.com/api/line/apikey/61738", {
       method: "POST",
       headers: {
-        "x-lib-apikey": SLIPOK_KEY // ✅ แก้ไข Header ให้ตรงตามที่ API ต้องการ
+        "x-lib-apikey": process.env.SLIPOK_KEY // ✅ แก้ไข Header ให้ตรงตามที่ API ต้องการ
       },
       body: slipFormData
     });
