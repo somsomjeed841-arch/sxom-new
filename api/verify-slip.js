@@ -54,10 +54,7 @@ export default async function handler(req, res) {
     const transactionId = result.data.transRef || result.data.transaction_id;
 
     // 4. เชื่อมต่อ Supabase (ใช้ Service Role Key เพื่อรัน RPC)
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 
     // 🔒 ป้องกันการใช้สลิปซ้ำ
     const { data: existing } = await supabase
