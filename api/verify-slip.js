@@ -49,6 +49,7 @@ module.exports = async function handler(req, res) {
 
       const result = await slipResponse.json()
       console.log("SLIP RESULT:", result)
+      console.log("DATA:", result.data)
 
       if (result.code !== 1000 || !result.data) {
         return res.status(400).json({ message: "Slip invalid" })
