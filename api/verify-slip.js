@@ -1,75 +1,76 @@
-import { createClient } from "@supabase/supabase-js"
-import formidable from "formidable"
-import fs from "fs"
-import FormData from "form-data"
-import fetch from "node-fetch"
-
-export const config = {
-  api: { bodyParser: false }
-}
+import { createClient } from '@supabase/supabase-js'
 
 export default async function handler(req, res) {
-  const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  )
 
-  if (req.method !== "POST") {
-    return res.status(405).end()
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const form = new formidable.IncomingForm()
+  try {
 
-  form.parse(req, async (err, fields, files) => {
-    try {
-      const uid = fields.uid
-      const file = files.files
+    const formData = req.body
 
-      if (!file) {
-        return res.status(400).json({ message: "no file" })
-      }
+    // เรียก SlipOK
+    const slipResponse = await fetch("https://api.slipok.com/api/line/apikey/61738", {
+      method: "POST",
+      body: formData
+    })
 
-      // ✅ ส่งไฟล์จริงไป SlipOK (แบบเดิม)
-      const slipForm = new FormData()
-      slipForm.append("files", fs.createReadStream(file.filepath))
+    const result = await slipResponse.json()
 
-      const response = await fetch(
-        `https://api.slipok.com/api/line/apikey/${process.env.SLIPOK_KEY}`,
-        {
-          method: "POST",
-          body: slipForm,
-          headers: slipForm.getHeaders()
-        }
-      )
-
-      const result = await response.json()
-      console.log(result)
-
-      if (result.code !== 1000) {
-        return res.status(400).json({ message: "slip invalid" })
-      }
-
-      const amount = Number(result.data.amount)
-
-      // ✅ เพิ่มเงินตรง ๆ (แบบบ้าน ๆ เหมือนเดิม)
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("balance")
-        .eq("id", uid)
-        .single()
-
-      const newBalance = (profile?.balance || 0) + amount
-
-      await supabase
-        .from("profiles")
-        .update({ balance: newBalance })
-        .eq("id", uid)
-
-      return res.json({ success: true, amount })
-
-    } catch (e) {
-      console.error(e)
-      return res.status(500).json({ message: "server error" })
+    if (!result.success) {
+      return res.status(400).json({ success: false })
     }
-  })
+
+    const amount = Number(result.data.amount)
+    const transactionId = result.data.transaction_id
+    const uid = result.data.receiver?.account?.name // หรือดึงจาก client header แทน (เดี๋ยวอธิบายต่อ)
+
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+
+    // 🔒 เช็คสลิปซ้ำ
+    const { data: existing } = await supabase
+      .from("topups")
+      .select("id")
+      .eq("transaction_id", transactionId)
+      .maybeSingle()
+
+    if (existing) {
+      return res.status(400).json({ success: false, message: "Slip already used" })
+    }
+
+    // 🔥 ดึง balance เดิม
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("balance")
+      .eq("id", uid)
+      .single()
+
+    const oldBalance = profile?.balance || 0
+    const newBalance = oldBalance + amount
+
+    // 💰 อัปเดต balance
+    await supabase
+      .from("profiles")
+      .update({ balance: newBalance })
+      .eq("id", uid)
+
+    // 🧾 บันทึก topup
+    await supabase
+      .from("topups")
+      .insert([{
+        user_id: uid,
+        amount: amount,
+        transaction_id: transactionId
+      }])
+
+    return res.status(200).json({ success: true })
+
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: 'Server error' })
+  }
 }
