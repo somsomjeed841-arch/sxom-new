@@ -10,8 +10,6 @@ module.exports.config = {
 
 module.exports = async function handler(req, res) {
 
-  console.log("===== START VERIFY =====")
-
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -22,28 +20,19 @@ module.exports = async function handler(req, res) {
 
     try {
 
-      console.log("FIELDS:", fields)
-      console.log("FILES:", files)
-
-      if (err) {
-        return res.status(500).json({ error: err.message })
-      }
+      if (err) return res.status(500).json({ error: err.message })
 
       const uid = fields.uid?.[0] || fields.uid
 
-      // 🔥 แก้ตรงนี้สำคัญสุด
       let file = files.files || files.file
       if (Array.isArray(file)) file = file[0]
 
-      if (!uid) return res.status(400).json({ error: 'NO UID' })
-      if (!file) return res.status(400).json({ error: 'NO FILE' })
-
-      console.log("FILEPATH:", file.filepath)
+      if (!uid || !file) {
+        return res.status(400).json({ error: 'Missing data' })
+      }
 
       const slipForm = new FormData()
       slipForm.append("files", fs.createReadStream(file.filepath))
-
-      console.log("CALLING SLIPOK...")
 
       const slipResponse = await fetch(
         `https://api.slipok.com/api/line/apikey/${process.env.SLIPOK_KEY}`,
@@ -58,8 +47,9 @@ module.exports = async function handler(req, res) {
 
       console.log("SLIP RESULT:", result)
 
-      if (!result.success) {
-        return res.status(400).json(result)
+      // 🔥 แก้ตรงนี้
+      if (result.code !== 1000) {
+        return res.status(400).json({ message: "Slip invalid", result })
       }
 
       const amount = Number(result.data.amount)
@@ -104,7 +94,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ success: true })
 
     } catch (error) {
-      console.error("SERVER ERROR:", error)
+      console.error(error)
       return res.status(500).json({ error: error.message })
     }
 
