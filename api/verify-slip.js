@@ -47,13 +47,20 @@ module.exports = async function handler(req, res) {
 
       console.log("SLIP RESULT:", result)
 
-      // 🔥 แก้ตรงนี้
-      if (result.code !== 1000) {
-        return res.status(400).json({ message: "Slip invalid", result })
+      // 🔥 กันพัง + เช็คให้ครบ
+      if (result.code !== 1000 || !result.data) {
+        return res.status(400).json({
+          message: "Slip invalid",
+          result
+        })
       }
 
-      const amount = Number(result.data.amount)
+      const amount = Number(result.data.amount || 0)
       const transactionId = result.data.transaction_id
+
+      if (!transactionId) {
+        return res.status(400).json({ message: "No transaction id" })
+      }
 
       const supabase = createClient(
         process.env.SUPABASE_URL,
@@ -94,7 +101,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ success: true })
 
     } catch (error) {
-      console.error(error)
+      console.error("SERVER ERROR:", error)
       return res.status(500).json({ error: error.message })
     }
 
