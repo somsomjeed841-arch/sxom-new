@@ -22,10 +22,10 @@ module.exports = async function handler(req, res) {
       if (err) return res.status(500).json({ error: 'Form parse error' })
 
       const uid = fields.uid
-      const file = files.files
+      const file = files.files?.[0] // ⭐ แก้ตรงนี้
 
-      if (!uid || !file) {
-        return res.status(400).json({ error: 'Missing data' })
+      if (!uid || !file?.filepath) {
+        return res.status(400).json({ error: 'Missing file or uid' })
       }
 
       const slipForm = new FormData()
@@ -42,21 +42,13 @@ module.exports = async function handler(req, res) {
       )
 
       const result = await slipResponse.json()
-
       console.log("SLIP RESULT:", result)
 
-      // ✅ เช็คแบบใหม่
       if (result.code !== 1000) {
         return res.status(400).json({ success:false, result })
       }
 
-      // ✅ ดึงข้อมูลแบบกันพลาด
       const slipData = result.data?.slip || result.data
-
-      if (!slipData) {
-        return res.status(400).json({ error: "No slip data", result })
-      }
-
       const amount = Number(slipData.amount)
       const transactionId = slipData.transaction_id
 
@@ -81,21 +73,15 @@ module.exports = async function handler(req, res) {
         .eq("id", uid)
         .single()
 
-      const oldBalance = profile?.balance || 0
-      const newBalance = oldBalance + amount
+      const newBalance = (profile?.balance || 0) + amount
 
-      await supabase
-        .from("profiles")
-        .update({ balance: newBalance })
-        .eq("id", uid)
+      await supabase.from("profiles").update({ balance: newBalance }).eq("id", uid)
 
-      await supabase
-        .from("topups")
-        .insert([{
-          user_id: uid,
-          amount,
-          transaction_id: transactionId
-        }])
+      await supabase.from("topups").insert([{
+        user_id: uid,
+        amount,
+        transaction_id: transactionId
+      }])
 
       return res.status(200).json({ success:true })
 
