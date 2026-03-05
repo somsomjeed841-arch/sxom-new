@@ -37,15 +37,14 @@ module.exports = async function handler(req, res) {
       slipForm.append("file", fs.createReadStream(file.filepath)) // ✅ แก้ตรงนี้
       slipForm.append("log", "true")
 
-      const slipResponse = await fetch(
-        `https://api.slipok.com/api/line/apikey/61738}`,
-        {
-          method: "POST",
-          body: slipForm,
-          headers: slipForm.getHeaders()
-        }
-      )
-
+const slipResponse = await fetch(
+  `https://api.slipok.com/api/line/apikey/${process.env.SLIPOK_KEY}`,
+  {
+    method: "POST",
+    body: slipForm,
+    headers: slipForm.getHeaders()
+  }
+)
       const result = await slipResponse.json()
 
       console.log("SlipOK response:", result) // 🔥 เผื่อดู log
