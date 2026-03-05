@@ -14,7 +14,10 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const form = new formidable.IncomingForm({ multiples: true })
+  const form = new formidable.IncomingForm({
+    multiples: false,
+    keepExtensions: true
+  })
 
   form.parse(req, async (err, fields, files) => {
 
@@ -22,17 +25,29 @@ module.exports = async function handler(req, res) {
 
       if (err) return res.status(500).json({ error: err.message })
 
+      console.log("FIELDS:", fields)
+      console.log("FILES:", files)
+
       const uid = fields.uid?.[0] || fields.uid
 
-      let file = files.files || files.file
+      // ✅ รองรับทุกเคสของ formidable
+      let file = files.files || files.file || Object.values(files)[0]
+
       if (Array.isArray(file)) file = file[0]
 
       if (!uid || !file) {
         return res.status(400).json({ error: 'Missing data' })
       }
 
+      // 🔥 ตรงนี้สำคัญมาก
+      const filePath = file.filepath || file.path
+
+      if (!filePath) {
+        return res.status(400).json({ error: 'File path missing' })
+      }
+
       const slipForm = new FormData()
-      slipForm.append("files", fs.createReadStream(file.filepath))
+      slipForm.append("files", fs.createReadStream(filePath))
 
       const slipResponse = await fetch(
         `https://api.slipok.com/api/line/apikey/${process.env.SLIPOK_KEY}`,
@@ -47,7 +62,7 @@ module.exports = async function handler(req, res) {
 
       console.log("SLIP RESULT:", result)
 
-      // 🔥 กันพัง + เช็คให้ครบ
+      // ✅ กัน data หาย
       if (result.code !== 1000 || !result.data) {
         return res.status(400).json({
           message: "Slip invalid",
