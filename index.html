@@ -1,3 +1,4 @@
+:::writing{variant="standard" id="auth01"}
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,130 +7,114 @@
 
 <style>
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: 'Segoe UI', sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
 }
 
 body{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#d8ccc2;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#d8ccc2;
 }
 
-/* กล่องลอย */
 .card{
-  width:380px;
-  padding:40px;
-  border-radius:20px;
-  background:#f3eee9;
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.15),
-    inset 0 1px 0 rgba(255,255,255,0.6);
-  text-align:center;
-  position:relative;
-  animation:fadeIn .5s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(20px);}
-  to{opacity:1; transform:translateY(0);}
+width:380px;
+padding:40px;
+border-radius:20px;
+background:#f3eee9;
+box-shadow:
+0 20px 40px rgba(0,0,0,0.15),
+inset 0 1px 0 rgba(255,255,255,0.6);
+text-align:center;
 }
 
 h2{
-  margin-bottom:20px;
-  font-weight:600;
-  color:#3e2f27;
+margin-bottom:20px;
+font-weight:600;
+color:#3e2f27;
 }
 
 input{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border-radius:10px;
-  border:1px solid #d4c4b8;
-  background:#fff;
-  outline:none;
-  transition:.2s;
-}
-
-input:focus{
-  border-color:#8c6b5a;
-  box-shadow:0 0 0 3px rgba(140,107,90,0.15);
+width:100%;
+padding:12px;
+margin:8px 0;
+border-radius:10px;
+border:1px solid #d4c4b8;
+background:#fff;
+outline:none;
 }
 
 button{
-  width:100%;
-  padding:12px;
-  margin-top:15px;
-  border:none;
-  border-radius:10px;
-  background:#8c6b5a;
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-  transition:.2s;
-}
-
-button:hover{
-  transform:translateY(-2px);
-  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+background:#8c6b5a;
+color:white;
+font-weight:600;
+cursor:pointer;
 }
 
 .switch{
-  margin-top:15px;
-  font-size:14px;
+margin-top:15px;
+font-size:14px;
 }
 
 .switch span{
-  color:#8c6b5a;
-  cursor:pointer;
-  font-weight:600;
+color:#8c6b5a;
+cursor:pointer;
+font-weight:600;
 }
 
 .hidden{
-  display:none;
+display:none;
 }
 
 .error{
-  color:red;
-  font-size:13px;
-  margin-top:5px;
+color:red;
+font-size:13px;
+margin-top:5px;
 }
 </style>
 </head>
+
 <body>
 
 <div class="card">
 
-  <!-- LOGIN -->
-  <div id="loginBox">
-    <h2>Sign In</h2>
-    <input id="loginEmail" type="email" placeholder="Email" required>
-    <input id="loginPass" type="password" placeholder="Password" required>
-    <button onclick="login()">LOGIN</button>
-    <div class="switch">
-      Don't have an account? 
-      <span onclick="showRegister()">Create Account</span>
-    </div>
-  </div>
+<div id="loginBox">
+<h2>Sign In</h2>
+<input id="loginEmail" type="email" placeholder="Email">
+<input id="loginPass" type="password" placeholder="Password">
+<button onclick="login()">LOGIN</button>
 
-  <!-- REGISTER -->
-  <div id="registerBox" class="hidden">
-    <h2>Create Account</h2>
-    <input id="regEmail" type="email" placeholder="Email" required>
-    <input id="regPass" type="password" placeholder="Password" required>
-    <input id="regPass2" type="password" placeholder="Confirm Password" required>
-    <div id="passError" class="error"></div>
-    <button onclick="register()">REGISTER</button>
-    <div class="switch">
-      Already have an account? 
-      <span onclick="showLogin()">Sign In</span>
-    </div>
-  </div>
+<div class="switch">
+Don't have an account?
+<span onclick="showRegister()">Create Account</span>
+</div>
+</div>
+
+<div id="registerBox" class="hidden">
+<h2>Create Account</h2>
+<input id="regEmail" type="email" placeholder="Email">
+<input id="regPass" type="password" placeholder="Password">
+<input id="regPass2" type="password" placeholder="Confirm Password">
+
+<div id="passError" class="error"></div>
+
+<button onclick="register()">REGISTER</button>
+
+<div class="switch">
+Already have an account?
+<span onclick="showLogin()">Sign In</span>
+</div>
+
+</div>
 
 </div>
 
@@ -141,6 +126,19 @@ const supabase = window.supabase.createClient(
 "https://uvbkeujfmzfhstxxpzvn.supabase.co",
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YmtldWpmbXpmaHN0eHhwenZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzA5NTYsImV4cCI6MjA4ODMwNjk1Nn0.91HhGLdQO_DpBP5mX0u8kX7W79YElGvJvLDVcxBNkCY"
 )
+
+// DOM
+const loginBox = document.getElementById("loginBox")
+const registerBox = document.getElementById("registerBox")
+
+const regEmail = document.getElementById("regEmail")
+const regPass = document.getElementById("regPass")
+const regPass2 = document.getElementById("regPass2")
+
+const loginEmail = document.getElementById("loginEmail")
+const loginPass = document.getElementById("loginPass")
+
+const passError = document.getElementById("passError")
 
 function showRegister(){
 loginBox.classList.add("hidden")
@@ -206,11 +204,9 @@ return
 
 localStorage.setItem("user",JSON.stringify(data.user))
 
-window.location.href = "shop.html"
+window.location.href = shop.html”
 
 }
-
-</script>
-
+  </script>
 </body>
 </html>
