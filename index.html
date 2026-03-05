@@ -6,77 +6,75 @@
 
 <style>
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family: 'Segoe UI', sans-serif;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
 }
 
 body{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:#d8ccc2;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#d8ccc2;
 }
 
 .card{
-width:380px;
-padding:40px;
-border-radius:20px;
-background:#f3eee9;
-box-shadow:0 20px 40px rgba(0,0,0,0.15);
-text-align:center;
+  width:380px;
+  padding:40px;
+  border-radius:20px;
+  background:#f3eee9;
+  box-shadow:0 20px 40px rgba(0,0,0,0.15);
+  text-align:center;
 }
 
 h2{
-margin-bottom:20px;
-color:#3e2f27;
+  margin-bottom:20px;
+  color:#3e2f27;
 }
 
 input{
-width:100%;
-padding:12px;
-margin:8px 0;
-border-radius:10px;
-border:1px solid #d4c4b8;
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #d4c4b8;
 }
 
 button{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:10px;
-background:#8c6b5a;
-color:white;
-font-weight:600;
-cursor:pointer;
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  border:none;
+  border-radius:10px;
+  background:#8c6b5a;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
 }
 
 .switch{
-margin-top:15px;
-font-size:14px;
+  margin-top:15px;
 }
 
 .switch span{
-color:#8c6b5a;
-cursor:pointer;
-font-weight:600;
+  color:#8c6b5a;
+  cursor:pointer;
+  font-weight:600;
 }
 
 .hidden{
-display:none;
+  display:none;
 }
 
 .error{
-color:red;
-font-size:13px;
-margin-top:5px;
+  color:red;
+  font-size:13px;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="card">
@@ -90,12 +88,11 @@ margin-top:5px;
 <button onclick="login()">LOGIN</button>
 
 <div class="switch">
-Don't have an account?
+Don't have account?
 <span onclick="showRegister()">Create Account</span>
 </div>
 
 </div>
-
 
 <div id="registerBox" class="hidden">
 
@@ -110,7 +107,7 @@ Don't have an account?
 <button onclick="register()">REGISTER</button>
 
 <div class="switch">
-Already have an account?
+Already have account?
 <span onclick="showLogin()">Sign In</span>
 </div>
 
@@ -118,27 +115,17 @@ Already have an account?
 
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
 const supabase = window.supabase.createClient(
 "https://uvbkeujfmzfhstxxpzvn.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqanRrc3JqYmlpZmdmZmhlZmR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NTE0MTcsImV4cCI6MjA4ODAyNzQxN30.36PRBK4fxC2rA-VMvQVfI_p0U4BVsO3pGY38e31XZAI"
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2YmtldWpmbXpmaHN0eHhwenZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzA5NTYsImV4cCI6MjA4ODMwNjk1Nn0.91HhGLdQO_DpBP5mX0u8kX7W79YElGvJvLDVcxBNkCY"
 )
 
 const loginBox = document.getElementById("loginBox")
 const registerBox = document.getElementById("registerBox")
-
-const regEmail = document.getElementById("regEmail")
-const regPass = document.getElementById("regPass")
-const regPass2 = document.getElementById("regPass2")
-const passError = document.getElementById("passError")
-
-const loginEmail = document.getElementById("loginEmail")
-const loginPass = document.getElementById("loginPass")
-
 
 window.showRegister = function(){
 loginBox.classList.add("hidden")
@@ -150,19 +137,20 @@ registerBox.classList.add("hidden")
 loginBox.classList.remove("hidden")
 }
 
-
 window.register = async function(){
 
-if(regPass.value !== regPass2.value){
-passError.innerText = "Passwords do not match"
+const email = document.getElementById("regEmail").value
+const pass = document.getElementById("regPass").value
+const pass2 = document.getElementById("regPass2").value
+
+if(pass !== pass2){
+document.getElementById("passError").innerText="Passwords do not match"
 return
 }
 
-passError.innerText = ""
-
-const { data, error } = await supabase.auth.signUp({
-email: regEmail.value,
-password: regPass.value
+const {data,error} = await supabase.auth.signUp({
+email:email,
+password:pass
 })
 
 if(error){
@@ -170,13 +158,11 @@ alert(error.message)
 return
 }
 
-await supabase.from("users").insert([
-{
-id: data.user.id,
-email: regEmail.value,
-credit: 0
-}
-])
+await supabase.from("users").insert([{
+id:data.user.id,
+email:email,
+credit:0
+}])
 
 alert("Account created")
 
@@ -184,12 +170,14 @@ showLogin()
 
 }
 
-
 window.login = async function(){
 
-const { data, error } = await supabase.auth.signInWithPassword({
-email: loginEmail.value,
-password: loginPass.value
+const email = document.getElementById("loginEmail").value
+const pass = document.getElementById("loginPass").value
+
+const {data,error} = await supabase.auth.signInWithPassword({
+email:email,
+password:pass
 })
 
 if(error){
@@ -199,7 +187,7 @@ return
 
 localStorage.setItem("user",JSON.stringify(data.user))
 
-window.location.href = "shop.html"
+window.location.href="shop.html"
 
 }
 
