@@ -1,26 +1,34 @@
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+)
+
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" })
   }
 
-  const { link } = req.body
-
-  if (!link) {
-    return res.status(400).json({ error: "No link provided" })
-  }
+  const { user_id, amount } = req.body
 
   try {
 
-    const response = await fetch("https://gift.truemoney.com/campaign/vouchers/" + link)
+    const { data, error } = await supabase
+      .from("users")
+      .update({
+        balance: supabase.raw(`balance + ${amount}`)
+      })
+      .eq("id", user_id)
 
-    const data = await response.json()
+    if (error) throw error
 
-    res.status(200).json(data)
+    res.status(200).json({ success: true })
 
   } catch (err) {
 
-    res.status(500).json({ error: "Redeem failed" })
+    res.status(500).json({ error: "Update balance failed" })
 
   }
 
