@@ -7,120 +7,151 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background:#d8ccc2;height:100vh;display:flex;justify-content:center;align-items:center;}
-.card{width:500px;background:#f3eee9;padding:40px;border-radius:25px;box-shadow:0 20px 40px rgba(0,0,0,0.2);text-align:center;}
-.profile-logo{width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto 20px;display:block;box-shadow:0 10px 25px rgba(0,0,0,0.3);}
-h2{margin-bottom:10px;color:#3e2f27;}
-.info{margin-top:20px;text-align:left;font-size:15px;color:#3e2f27;}
-.info div{margin-bottom:12px;padding:10px;background:#ede5df;border-radius:10px;display:flex;justify-content:space-between;align-items:center;}
-.info span{font-weight:bold;color:#8c6b5a;word-break:break-all;margin-left:10px;}
-button{margin-top:25px;padding:10px 20px;border:none;border-radius:10px;background:#8c6b5a;color:white;cursor:pointer;font-weight:600;transition:.3s;}
-button:hover{background:#3e2f27;}
+
+.card{
+width:500px;
+background:#f3eee9;
+padding:40px;
+border-radius:25px;
+box-shadow:0 20px 40px rgba(0,0,0,0.2);
+text-align:center;
+}
+
+.profile-logo{
+width:100px;
+height:100px;
+border-radius:50%;
+object-fit:cover;
+margin:0 auto 20px;
+display:block;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+h2{
+margin-bottom:10px;
+color:#3e2f27;
+}
+
+.info{
+margin-top:20px;
+text-align:left;
+font-size:15px;
+color:#3e2f27;
+}
+
+.info div{
+margin-bottom:12px;
+padding:10px;
+background:#ede5df;
+border-radius:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.info span{
+font-weight:bold;
+color:#8c6b5a;
+word-break:break-all;
+margin-left:10px;
+}
+
+button{
+margin-top:25px;
+padding:10px 20px;
+border:none;
+border-radius:10px;
+background:#8c6b5a;
+color:white;
+cursor:pointer;
+font-weight:600;
+transition:.3s;
+}
+
+button:hover{
+background:#3e2f27;
+}
 </style>
 </head>
+
 <body>
 
 <div class="card">
+
 <img src="logo.png" class="profile-logo">
+
 <h2>My Profile</h2>
 
 <div class="info">
-<div>Email: <span id="email">Loading...</span></div>
-<div>User ID: <span id="uid">Loading...</span></div>
-<div>Balance: <span id="display-balance">฿0</span></div>
+
+<div>
+Email:
+<span id="email">Loading...</span>
+</div>
+
+<div>
+User ID:
+<span id="uid">Loading...</span>
+</div>
+
+<div>
+Balance:
+<span id="display-balance">฿0</span>
+</div>
+
 </div>
 
 <button onclick="goBack()">Back to Shop</button>
+
 </div>
 
-<script src="/env.js"></script>
+<script src="env.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script type="module">
+<script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-/* 🔥 Firebase Config */
-const firebaseConfig = {
-  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-  authDomain: "sxom-new.firebaseapp.com",
-  projectId: "sxom-new"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-/* 🔥 Supabase */
-const supabase = createClient(
+/* 🔐 เชื่อม Supabase */
+const supabase = window.supabase.createClient(
   window.SUPABASE_URL,
   window.SUPABASE_KEY
-);
+)
 
-/* 🔐 เมื่อ auth เปลี่ยน */
-onAuthStateChanged(auth, async (user) => {
 
-  if (!user) {
-    window.location.href = "/index.html";
-    return;
-  }
+/* 👤 โหลด user */
+async function loadUser(){
 
-  document.getElementById("email").innerText = user.email;
-  document.getElementById("uid").innerText = user.uid;
+const { data: { user } } = await supabase.auth.getUser()
 
-  try {
+if(!user){
+window.location.href="index.html"
+return
+}
 
-    /* 🔎 เช็คว่า profile มีไหม */
-    const { data: existingProfile, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.uid)
-      .maybeSingle();
+document.getElementById("email").innerText = user.email
+document.getElementById("uid").innerText = user.id
 
-    if (error) {
-      console.error("Profile check error:", error);
-      return;
-    }
 
-    /* 🆕 ถ้าไม่มี → สร้างใหม่ */
-    if (!existingProfile) {
-      const { error: insertError } = await supabase
-        .from("profiles")
-        .insert({
-          id: user.uid,
-          email: user.email,
-          balance: 0
-        });
+/* 🔎 โหลด balance */
+const { data } = await supabase
+.from("profiles")
+.select("balance")
+.eq("id",user.id)
+.single()
 
-      if (insertError) {
-        console.error("Insert profile error:", insertError);
-        return;
-      }
-    }
+const balance = data?.balance ?? 0
 
-    /* 💰 โหลด balance */
-    const { data: profileData, error: balanceError } = await supabase
-      .from("profiles")
-      .select("balance")
-      .eq("id", user.uid)
-      .single();
+document.getElementById("display-balance").innerText =
+"฿"+Number(balance).toLocaleString()
 
-    if (balanceError) {
-      console.error("Balance load error:", balanceError);
-      return;
-    }
+}
 
-    const balance = profileData?.balance ?? 0;
+loadUser()
 
-    document.getElementById("display-balance").innerText =
-      "฿" + Number(balance).toLocaleString();
 
-  } catch (err) {
-    console.error("Unexpected error:", err);
-  }
-
-});
-
-window.goBack = () => window.location.href = "/shop.html";
+/* 🔙 กลับร้าน */
+function goBack(){
+window.location.href="shop.html"
+}
 
 </script>
 
