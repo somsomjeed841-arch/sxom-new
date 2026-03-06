@@ -5,320 +5,266 @@
 <title>Product Detail</title>
 
 <style>
+
 body{
-  margin:0;
-  font-family:'Segoe UI', sans-serif;
-  background:#d8ccc2;
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:#d8ccc2;
 }
 
 .container{
-  max-width:1100px;
-  margin:60px auto;
-  background:#f3eee9;
-  border-radius:25px;
-  padding:40px;
-  box-shadow:0 20px 50px rgba(0,0,0,0.2);
+max-width:1000px;
+margin:60px auto;
+background:#f3eee9;
+border-radius:25px;
+padding:40px;
+box-shadow:0 20px 50px rgba(0,0,0,0.2);
 }
 
 .product-layout{
-  display:flex;
-  gap:50px;
-  flex-wrap:wrap;
+display:flex;
+gap:50px;
+flex-wrap:wrap;
 }
 
-.left{ flex:1; }
+.left{
+flex:1;
+}
+
 .left img{
-  width:100%;
-  border-radius:20px;
+width:100%;
+border-radius:20px;
 }
 
-.right{ flex:1; }
+.right{
+flex:1;
+}
 
 .right h2{
-  margin-bottom:15px;
-  color:#3e2f27;
+margin-bottom:15px;
+color:#3e2f27;
 }
 
 .price{
-  font-size:20px;
-  font-weight:600;
-  color:#8c6b5a;
-  margin:10px 0 20px;
-}
-
-.description{
-  background:#fff;
-  border:2px solid #d4c4b8;
-  border-radius:15px;
-  padding:20px;
-  margin-bottom:25px;
-  color:#5b463a;
-  line-height:1.7;
-  box-shadow:0 8px 20px rgba(0,0,0,0.08);
-}
-
-.description-title{
-  font-weight:600;
-  margin-bottom:10px;
-  color:#3e2f27;
-  font-size:15px;
-  letter-spacing:1px;
-}
-
-iframe{
-  width:100%;
-  height:250px;
-  border-radius:15px;
-  margin-bottom:20px;
+font-size:22px;
+font-weight:600;
+color:#8c6b5a;
+margin-bottom:25px;
 }
 
 button{
-  padding:12px 20px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  margin-right:10px;
-  transition:0.2s;
-}
-
-button:hover{
-  opacity:0.85;
-  transform:translateY(-2px);
+padding:12px 20px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+margin-right:10px;
+font-size:14px;
 }
 
 .add{
-  background:#8c6b5a;
-  color:white;
+background:#8c6b5a;
+color:white;
 }
 
 .buy{
-  background:#3e2f27;
-  color:white;
+background:#3e2f27;
+color:white;
 }
 
-.discount-box{
-  margin-top:20px;
-}
-
-.discount-box input{
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #d4c4b8;
-  width:200px;
-}
-
-/* ===== MODAL ===== */
-
-.modal{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.5);
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-
-.modal-content{
-  background:white;
-  padding:30px;
-  border-radius:20px;
-  width:350px;
-  text-align:center;
-  box-shadow:0 20px 40px rgba(0,0,0,0.2);
-  animation:pop 0.2s ease;
-}
-
-.modal-buttons{
-  margin-top:20px;
-}
-
-.modal-buttons button{
-  padding:10px 20px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  margin:0 10px;
-}
-
-#confirmBuy{
-  background:#3e2f27;
-  color:white;
-}
-
-#cancelBuy{
-  background:#ccc;
-}
-
-@keyframes pop{
-  from{transform:scale(0.8); opacity:0;}
-  to{transform:scale(1); opacity:1;}
-}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-  <div class="product-layout">
 
-    <div class="left">
-      <img id="productImg">
-    </div>
+<div class="product-layout">
 
-    <div class="right">
-      <h2 id="productName"></h2>
-      <div class="price" id="productPrice"></div>
-
-      <div class="description">
-        <div class="description-title">PRODUCT DETAILS</div>
-        This is a premium product with high performance and quality.
-      </div>
-
-      <iframe id="youtubeVideo" allowfullscreen></iframe>
-
-      <button class="add" onclick="addToCart()">Add to Cart</button>
-      <button class="buy" id="buyBtn">Buy Now</button>
-
-      <div class="discount-box">
-        <p>Discount Code:</p>
-        <input id="discountCode" placeholder="Enter code">
-      </div>
-    </div>
-  </div>
+<div class="left">
+<img id="productImg">
 </div>
 
-<!-- MODAL -->
-<div id="buyModal" class="modal">
-  <div class="modal-content">
-    <h3>Confirm Purchase</h3>
-    <p id="confirmText"></p>
-    <div class="modal-buttons">
-      <button id="cancelBuy">Cancel</button>
-      <button id="confirmBuy">Confirm</button>
-    </div>
-  </div>
+<div class="right">
+<h2 id="productName"></h2>
+<div class="price" id="productPrice"></div>
+
+<button class="add" onclick="addToCart()">Add To Cart</button>
+<button class="buy" onclick="buyNow()">Buy Now</button>
+
 </div>
+
+</div>
+
+</div>
+
+<script src="env.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// ====== PRODUCT DATA ======
-const products = {
-  "BOT Trading EA": [
-    {name:"EA 0.01 TFM1", price:199, img:"ea.PNG", youtube:"..."},
-    {name:"EA 0.01 TFM5", price:199, img:"eamt5.PNG", youtube:"..."}
-  ],
-  "Discord": [
-    {name:"Account Discrod 1 Month", price:10, img:"ac1m.PNG", youtube:"..."},
-    {name:"Account Discrod 1 Year", price:10, img:"ac1y.PNG", youtube:"..."}
-  ],
-  "Nitro": [
-    {name:"Discord Nitro 3 Month", price:59, img:"ni3m.PNG", youtube:"..."},
-    {name:"Discord Nitro 1 Month", price:59, img:"ni1m.PNG", youtube:"..."}
-  ],
-  "BOT Discord": [
-    {name:"Story BOT", price:199, img:"storybot.PNG", youtube:"..."},
-    {name:"blacklist BOT", price:199, img:"bl.PNG", youtube:"..."}
-  ],
-  "Reshade": [
-    {name:"SXOM V1", price:39, img:"vps1.PNG", youtube:"..."},
-    {name:"SXOM V2", price:39, img:"vps2.PNG", youtube:"..."}
-  ]
-};
 
-const params = new URLSearchParams(window.location.search);
-const category = params.get("cat");
-const name = params.get("name");
-const product = products[category]?.find(p => p.name === name);
+const supabase = window.supabase.createClient(
+window.SUPABASE_URL,
+window.SUPABASE_KEY
+)
+
+let user = null
+let product = null
+
+async function getUser(){
+
+const {data:{user:u}} = await supabase.auth.getUser()
+
+if(!u){
+window.location.href="index.html"
+return
+}
+
+user = u
+
+}
+
+getUser()
+
+/* ------------------------
+PRODUCT DATABASE
+------------------------ */
+
+const products = {
+
+"Nitro":[
+{
+name:"Discord Nitro 1 Month",
+price:59,
+img:"ni1m.PNG"
+},
+{
+name:"Discord Nitro 3 Month",
+price:149,
+img:"ni3m.PNG"
+}
+],
+
+"Discord":[
+{
+name:"Discord Account",
+price:35,
+img:"discord1.png"
+}
+],
+
+"BOT Discord":[
+{
+name:"Premium Discord Bot",
+price:120,
+img:"bot1.png"
+}
+],
+
+"BOT Trading EA":[
+{
+name:"Forex Trading EA",
+price:599,
+img:"ea1.png"
+}
+],
+
+"Reshade":[
+{
+name:"GTA Reshade Pack",
+price:45,
+img:"reshade1.png"
+}
+]
+
+}
+
+/* ------------------------
+GET URL PARAM
+------------------------ */
+
+const params = new URLSearchParams(window.location.search)
+
+const category = params.get("cat")
+const name = params.get("name")
+
+if(products[category]){
+
+product = products[category].find(p => p.name === name)
+
+}
 
 if(product){
-  document.getElementById("productName").innerText = product.name;
-  document.getElementById("productPrice").innerText = "฿" + product.price;
-  document.getElementById("productImg").src = product.img;
-  document.getElementById("youtubeVideo").src = product.youtube;
+
+document.getElementById("productName").innerText = product.name
+document.getElementById("productPrice").innerText = "฿"+product.price
+document.getElementById("productImg").src = product.img
+
 }
+
+/* ------------------------
+CART
+------------------------ */
 
 function addToCart(){
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart.push({...product, category, qty:1});
-  localStorage.setItem("cart", JSON.stringify(cart));
-  alert("Added to cart 🛒");
+
+let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+cart.push({
+name:product.name,
+price:product.price,
+img:product.img
+})
+
+localStorage.setItem("cart",JSON.stringify(cart))
+
+alert("Added to cart")
+
 }
-</script>
 
-  <script src="/env.js"></script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+/* ------------------------
+BUY
+------------------------ */
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-  authDomain: "sxom-new.firebaseapp.com",
-  projectId: "sxom-new"
-};
+async function buyNow(){
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const {data} = await supabase
+.from("users")
+.select("credit")
+.eq("id",user.id)
+.single()
 
-const supabase = createClient(
-  window.SUPABASE_URL,
-  window.SUPABASE_KEY
-);
+const balance = data?.credit ?? 0
 
-let currentUser = null;
+if(balance < product.price){
 
-onAuthStateChanged(auth, (user)=>{
-  if(user){ currentUser = user; }
-});
+alert("ยอดเงินไม่พอ")
+return
 
-const buyBtn = document.getElementById("buyBtn");
-const modal = document.getElementById("buyModal");
-const confirmText = document.getElementById("confirmText");
-const confirmBtn = document.getElementById("confirmBuy");
-const cancelBtn = document.getElementById("cancelBuy");
+}
 
-buyBtn.addEventListener("click", ()=>{
-  confirmText.innerText = `Confirm purchase of ${product.name} for ฿${product.price}?`;
-  modal.style.display = "flex";
-});
+const newBalance = balance - product.price
 
-cancelBtn.onclick = ()=> modal.style.display = "none";
+await supabase
+.from("users")
+.update({credit:newBalance})
+.eq("id",user.id)
 
-confirmBtn.onclick = async ()=>{
-  modal.style.display = "none";
+await supabase
+.from("orders")
+.insert([
+{
+user_id:user.id,
+product:product.name,
+price:product.price
+}
+])
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("balance")
-    .eq("id", currentUser.uid)
-    .single();
+alert("Purchase successful")
 
-  const balance = Number(profile.balance ?? 0);
+window.location.href="profile.html"
 
-  if(balance < product.price){
-    alert("ยอดเงินไม่เพียงพอ");
-    return;
-  }
+}
 
-  await supabase
-    .from("profiles")
-    .update({ balance: balance - product.price })
-    .eq("id", currentUser.uid);
-
-  await supabase
-    .from("orders")
-    .insert([{
-      user_id: currentUser.uid,
-      product_name: product.name,
-      price: product.price,
-      status: "completed"
-    }]);
-
-  alert("Purchase successful ✅");
-  window.location.href = "/profile.html";
-};
 </script>
 
 </body>
