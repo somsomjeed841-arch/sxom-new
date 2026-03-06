@@ -6,216 +6,245 @@
 
 <style>
 body{
-  margin:0;
-  font-family:'Segoe UI', sans-serif;
-  background:#d8ccc2;
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:#d8ccc2;
 }
+
 .container{
-  max-width:1000px;
-  margin:60px auto;
-  background:#f3eee9;
-  padding:40px;
-  border-radius:25px;
-  box-shadow:0 20px 50px rgba(0,0,0,0.2);
+max-width:1000px;
+margin:60px auto;
+background:#f3eee9;
+padding:40px;
+border-radius:25px;
+box-shadow:0 20px 50px rgba(0,0,0,0.2);
 }
+
 .cart-item{
-  display:flex;
-  align-items:center;
-  gap:20px;
-  margin-bottom:20px;
-  padding:15px;
-  background:white;
-  border-radius:15px;
+display:flex;
+align-items:center;
+gap:20px;
+margin-bottom:20px;
+padding:15px;
+background:white;
+border-radius:15px;
 }
+
 .cart-item img{
-  width:120px;
-  border-radius:10px;
+width:120px;
+border-radius:10px;
 }
+
 .price{
-  font-weight:600;
-  color:#8c6b5a;
+font-weight:600;
+color:#8c6b5a;
 }
+
 .total{
-  text-align:right;
-  font-size:20px;
-  font-weight:600;
-  margin-top:30px;
-}
-button{
-  cursor:pointer;
+text-align:right;
+font-size:20px;
+font-weight:600;
+margin-top:30px;
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
-  <h2>My Cart 🛒</h2>
-  <div id="cartItems"></div>
-  <div class="total" id="totalPrice"></div>
-  <button onclick="checkout()" style="
-    margin-top:20px;
-    padding:12px 20px;
-    background:#3e2f27;
-    color:white;
-    border:none;
-    border-radius:10px;
-  ">
-  Checkout
-  </button>
+
+<h2>My Cart 🛒</h2>
+
+<div id="cartItems"></div>
+
+<div class="total" id="totalPrice"></div>
+
+<button onclick="checkout()" style="
+margin-top:20px;
+padding:12px 20px;
+background:#3e2f27;
+color:white;
+border:none;
+border-radius:10px;
+">
+Checkout
+</button>
+
 </div>
 
-<script src="/env.js"></script>
+<script src="env.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script type="module">
+<script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const supabase = window.supabase.createClient(
+window.SUPABASE_URL,
+window.SUPABASE_KEY
+)
 
-/* ✅ Firebase (แก้ apiKey ถูกต้องแล้ว) */
-const firebaseConfig = {
-  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-  authDomain: "sxom-new.firebaseapp.com",
-  projectId: "sxom-new"
-};
+let currentUser=null
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+async function getUser(){
 
-/* ✅ Supabase */
-const supabase = createClient(
-  window.SUPABASE_URL,
-  window.SUPABASE_KEY
-);
+const {data:{user}} = await supabase.auth.getUser()
 
-/* 🔐 บังคับ login */
-let currentUser = null;
-
-onAuthStateChanged(auth, (user)=>{
-  if(!user){
-    window.location.href = "index.html";
-  } else {
-    currentUser = user;
-  }
-});
-
-/* 🛒 โหลดสินค้า */
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-const cartContainer = document.getElementById("cartItems");
-let total = 0;
-
-function renderCart(){
-  cartContainer.innerHTML = "";
-  total = 0;
-
-  if(cart.length === 0){
-    cartContainer.innerHTML = "<p>Your cart is empty.</p>";
-    document.getElementById("totalPrice").innerText = "";
-    return;
-  }
-
-  cart.forEach((item, index) => {
-
-    total += item.price * item.qty;
-
-    cartContainer.innerHTML += `
-      <div class="cart-item">
-        <img src="${item.img}">
-        <div style="flex:1;">
-          <h3>${item.name}</h3>
-          <div class="price">฿${item.price}</div>
-          <div>
-            <button onclick="decreaseQty(${index})">-</button>
-            <span style="margin:0 10px">${item.qty}</span>
-            <button onclick="increaseQty(${index})">+</button>
-          </div>
-        </div>
-        <button onclick="removeItem(${index})"
-        style="background:#a94442;color:white;border:none;padding:8px 12px;border-radius:8px;">
-        Remove</button>
-      </div>
-    `;
-  });
-
-  document.getElementById("totalPrice").innerText =
-    "Total: ฿" + total.toLocaleString();
+if(!user){
+window.location.href="index.html"
+return
 }
 
-renderCart();
+currentUser=user
 
-/* ปุ่มต้องผูกกับ window เพราะใช้ module */
-window.removeItem = function(index){
-  cart.splice(index, 1);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
-};
+}
 
-window.increaseQty = function(index){
-  cart[index].qty += 1;
-  localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
-};
+getUser()
 
-window.decreaseQty = function(index){
-  if(cart[index].qty > 1){
-    cart[index].qty -= 1;
-  }
-  localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
-};
+let cart = JSON.parse(localStorage.getItem("cart")) || []
 
-/* 🔥 Checkout */
-window.checkout = async function(){
+const cartContainer=document.getElementById("cartItems")
 
-  if(!currentUser){
-    alert("กรุณา Login ก่อน");
-    return;
-  }
+let total=0
 
-  if(cart.length === 0){
-    alert("ไม่มีสินค้า");
-    return;
-  }
+function renderCart(){
 
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("balance")
-    .eq("id", currentUser.uid)
-    .single();
+cartContainer.innerHTML=""
+total=0
 
-  if(error || !profile){
-    alert("ดึงข้อมูลผู้ใช้ไม่สำเร็จ");
-    return;
-  }
+if(cart.length===0){
 
-  if(profile.balance < total){
-    alert("เงินไม่พอ ❌");
-    return;
-  }
+cartContainer.innerHTML="<p>Your cart is empty</p>"
+document.getElementById("totalPrice").innerText=""
+return
 
-  // หักเงิน
-  await supabase
-    .from("profiles")
-    .update({ balance: profile.balance - total })
-    .eq("id", currentUser.uid);
+}
 
-  // บันทึก order
-  for(const item of cart){
-    await supabase.from("orders").insert([
-      {
-        user_id: currentUser.uid,
-        product_name: item.name,
-        price: item.price * item.qty,
-        status: "success"
-      }
-    ]);
-  }
+cart.forEach((item,index)=>{
 
-  localStorage.removeItem("cart");
+const qty=item.qty || 1
 
-  alert("สั่งซื้อสำเร็จ ✅");
-  window.location.href = "shop.html";
-};
+total += item.price * qty
+
+cartContainer.innerHTML += `
+<div class="cart-item">
+
+<img src="${item.img}">
+
+<div style="flex:1;">
+<h3>${item.name}</h3>
+<div class="price">฿${item.price}</div>
+
+<div>
+<button onclick="decreaseQty(${index})">-</button>
+<span style="margin:0 10px">${qty}</span>
+<button onclick="increaseQty(${index})">+</button>
+</div>
+
+</div>
+
+<button onclick="removeItem(${index})"
+style="background:#a94442;color:white;border:none;padding:8px 12px;border-radius:8px;">
+Remove
+</button>
+
+</div>
+`
+
+})
+
+document.getElementById("totalPrice").innerText =
+"Total: ฿"+total.toLocaleString()
+
+}
+
+renderCart()
+
+function removeItem(index){
+
+cart.splice(index,1)
+
+localStorage.setItem("cart",JSON.stringify(cart))
+
+renderCart()
+
+}
+
+function increaseQty(index){
+
+cart[index].qty = (cart[index].qty || 1) + 1
+
+localStorage.setItem("cart",JSON.stringify(cart))
+
+renderCart()
+
+}
+
+function decreaseQty(index){
+
+if((cart[index].qty || 1) > 1){
+cart[index].qty -= 1
+}
+
+localStorage.setItem("cart",JSON.stringify(cart))
+
+renderCart()
+
+}
+
+async function checkout(){
+
+if(!currentUser){
+alert("กรุณา Login ก่อน")
+return
+}
+
+if(cart.length===0){
+alert("ไม่มีสินค้า")
+return
+}
+
+const {data}=await supabase
+.from("users")
+.select("credit")
+.eq("id",currentUser.id)
+.single()
+
+const balance=data?.credit ?? 0
+
+if(balance < total){
+
+alert("เงินไม่พอ ❌")
+return
+
+}
+
+const newBalance = balance - total
+
+await supabase
+.from("users")
+.update({credit:newBalance})
+.eq("id",currentUser.id)
+
+for(const item of cart){
+
+await supabase
+.from("orders")
+.insert([
+{
+user_id:currentUser.id,
+product:item.name,
+price:item.price * (item.qty || 1)
+}
+])
+
+}
+
+localStorage.removeItem("cart")
+
+alert("สั่งซื้อสำเร็จ ✅")
+
+window.location.href="shop.html"
+
+}
 
 </script>
 
