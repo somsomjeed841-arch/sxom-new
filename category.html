@@ -45,7 +45,7 @@ body{
   width:100%;
   height:220px;
   object-fit:cover;
-  border-radius:15px 15px 0 0;
+  border-radius:15px;
   margin-bottom:15px;
 }
 
@@ -74,13 +74,33 @@ button{
 }
 </style>
 </head>
+
 <body>
 
 <div class="header" id="categoryTitle"></div>
-
 <div class="grid" id="productGrid"></div>
 
+<script src="env.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+
+const supabase = window.supabase.createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_KEY
+)
+
+async function checkLogin(){
+
+  const { data:{ user } } = await supabase.auth.getUser()
+
+  if(!user){
+    window.location.href = "index.html"
+  }
+
+}
+
+checkLogin()
 
 const products = {
   "BOT Trading EA": [
@@ -88,8 +108,8 @@ const products = {
     {name:"EA 0.01 TFM5", price:199, img:"eamt5.PNG"}
   ],
   "Discord": [
-    {name:"Account Discrod 1 Month", price:10, img:"ac1m.PNG"},
-    {name:"Account Discrod 1 Year", price:10, img:"ac1y.PNG"}
+    {name:"Account Discord 1 Month", price:10, img:"ac1m.PNG"},
+    {name:"Account Discord 1 Year", price:10, img:"ac1y.PNG"}
   ],
   "Nitro": [
     {name:"Discord Nitro 3 Month", price:59, img:"ni3m.PNG"},
@@ -97,65 +117,73 @@ const products = {
   ],
   "BOT Discord": [
     {name:"Story BOT", price:199, img:"storybot.PNG"},
-    {name:"blacklist BOT", price:199, img:"bl.PNG"}
+    {name:"Blacklist BOT", price:199, img:"bl.PNG"}
   ],
   "Reshade": [
     {name:"SXOM V1", price:39, img:"vps1.PNG"},
     {name:"SXOM V2", price:39, img:"vps2.PNG"}
   ]
-};
+}
 
-const params = new URLSearchParams(window.location.search);
-const category = params.get("cat");
+const params = new URLSearchParams(window.location.search)
+const category = params.get("cat")
 
-document.getElementById("categoryTitle").innerText = category;
+document.getElementById("categoryTitle").innerText = category
 
-const grid = document.getElementById("productGrid");
+const grid = document.getElementById("productGrid")
 
 if(products[category]){
-  products[category].forEach((p) => {
+
+  products[category].forEach((p)=>{
+
     grid.innerHTML += `
-      <div class="card">
-        <img src="${p.img}">
-        <div style="padding:20px;">
-          <h3>${p.name}</h3>
-          <div class="price">฿${p.price}</div>
-          <button class="add"
-            onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">
-            Add to Cart
-          </button>
-          <button class="buy"
-            onclick="viewProduct('${p.name}', '${category}')">
-            View
-          </button>
-        </div>
-      </div>
-    `;
-  });
+    <div class="card">
+
+      <img src="${p.img}">
+
+      <h3>${p.name}</h3>
+
+      <div class="price">฿${p.price}</div>
+
+      <button class="add"
+      onclick="addToCart('${p.name}',${p.price},'${p.img}')">
+      Add to Cart
+      </button>
+
+      <button class="buy"
+      onclick="viewProduct('${p.name}','${category}')">
+      View
+      </button>
+
+    </div>
+    `
+  })
+
 }
 
-function addToCart(name, price, img){
+function addToCart(name,price,img){
 
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  let cart = JSON.parse(localStorage.getItem("cart")) || []
 
   cart.push({
-    name: name,
-    price: price,
-    img: img,
-    qty: 1
-  });
+    name:name,
+    price:price,
+    img:img,
+    qty:1
+  })
 
-  localStorage.setItem("cart", JSON.stringify(cart));
+  localStorage.setItem("cart",JSON.stringify(cart))
 
-  alert("เพิ่มสินค้าแล้ว 🛒");
+  alert("เพิ่มสินค้าแล้ว 🛒")
+
 }
 
-function viewProduct(name, category){
+function viewProduct(name,category){
+
   window.location.href =
-    "product.html?cat=" +
-    encodeURIComponent(category) +
-    "&name=" +
-    encodeURIComponent(name);
+  "product.html?cat="+encodeURIComponent(category)
+  +"&name="+encodeURIComponent(name)
+
 }
 
 </script>
