@@ -6,26 +6,117 @@
 <title>Top Up - SXOM JEXM</title>
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
-body { background:#d8ccc2; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
-.container { width:100%; max-width:450px; background:#f3eee9; padding:30px; border-radius:30px; box-shadow:0 20px 60px rgba(0,0,0,0.1); text-align:center; }
-.tabs { display:flex; gap:10px; margin-bottom:25px; background:#ede5df; padding:5px; border-radius:15px; }
-.tab { flex:1; padding:10px; border-radius:12px; cursor:pointer; transition:.3s; font-weight:600; color:#8c6b5a; font-size:14px; }
-.tab.active { background:#8c6b5a; color:white; }
-.method-content { display:none; }
-.method-content.active { display:block; }
-.qr-section { background:white; padding:15px; border-radius:20px; display:inline-block; margin:15px 0; }
-.qr-img { width:180px; height:180px; object-fit:contain; }
-.upload-area { border:2px dashed #d1c4bc; border-radius:20px; padding:20px; background:#ede5df; margin:20px 0; }
-.btn-verify { background:#8c6b5a; color:white; border:none; padding:15px; border-radius:15px; width:100%; font-size:16px; font-weight:600; cursor:pointer; }
-.btn-verify:disabled { background:#ccc; }
-.status { margin-top:15px; font-size:14px; min-height:20px; }
-.btn-back { margin-top:20px; display:inline-block; text-decoration:none; color:#8c6b5a; font-size:13px; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+
+body{
+background:#d8ccc2;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.container{
+width:100%;
+max-width:450px;
+background:#f3eee9;
+padding:30px;
+border-radius:30px;
+box-shadow:0 20px 60px rgba(0,0,0,0.1);
+text-align:center;
+}
+
+.tabs{
+display:flex;
+gap:10px;
+margin-bottom:25px;
+background:#ede5df;
+padding:5px;
+border-radius:15px;
+}
+
+.tab{
+flex:1;
+padding:10px;
+border-radius:12px;
+cursor:pointer;
+font-weight:600;
+color:#8c6b5a;
+font-size:14px;
+}
+
+.tab.active{
+background:#8c6b5a;
+color:white;
+}
+
+.method-content{
+display:none;
+}
+
+.method-content.active{
+display:block;
+}
+
+.qr-section{
+background:white;
+padding:15px;
+border-radius:20px;
+display:inline-block;
+margin:15px 0;
+}
+
+.qr-img{
+width:180px;
+height:180px;
+object-fit:contain;
+}
+
+.upload-area{
+border:2px dashed #d1c4bc;
+border-radius:20px;
+padding:20px;
+background:#ede5df;
+margin:20px 0;
+}
+
+.btn-verify{
+background:#8c6b5a;
+color:white;
+border:none;
+padding:15px;
+border-radius:15px;
+width:100%;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+}
+
+.btn-verify:disabled{
+background:#ccc;
+}
+
+.status{
+margin-top:15px;
+font-size:14px;
+min-height:20px;
+}
+
+.btn-back{
+margin-top:20px;
+display:inline-block;
+text-decoration:none;
+color:#8c6b5a;
+font-size:13px;
+}
 </style>
 </head>
+
 <body>
 
 <div class="container">
+
 <h2>เติมเงินเข้าระบบ</h2>
 
 <div class="tabs">
@@ -50,92 +141,105 @@ body { background:#d8ccc2; min-height:100vh; display:flex; justify-content:cente
 <input type="file" id="slipInput" accept="image/*">
 </div>
 
-<button id="uploadBtn" class="btn-verify" onclick="verifyAndTopup()">ตรวจสอบสลิป</button>
+<button id="uploadBtn" class="btn-verify" onclick="verifyAndTopup()">
+ตรวจสอบสลิป
+</button>
+
 <div id="status" class="status"></div>
 
 <a href="shop.html" class="btn-back">← กลับหน้าหลัก</a>
+
 </div>
 
 <script src="/env.js"></script>
+
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
 
-const firebaseConfig = {
-apiKey:"AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-authDomain:"sxom-new.firebaseapp.com",
-projectId:"sxom-new"
-};
+const supabase = createClient(
+window.SUPABASE_URL,
+window.SUPABASE_KEY
+)
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const user = JSON.parse(localStorage.getItem("user"))
 
-const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
-
-onAuthStateChanged(auth,(user)=>{
-if(!user) window.location.href="index.html";
-});
+if(!user){
+window.location.href="index.html"
+}
 
 window.switchTab = function(e,method){
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-document.querySelectorAll(".method-content").forEach(c=>c.classList.remove("active"));
-e.currentTarget.classList.add("active");
-document.getElementById(method+"-content").classList.add("active");
+
+document.querySelectorAll(".tab")
+.forEach(t=>t.classList.remove("active"))
+
+document.querySelectorAll(".method-content")
+.forEach(c=>c.classList.remove("active"))
+
+e.currentTarget.classList.add("active")
+
+document
+.getElementById(method+"-content")
+.classList.add("active")
+
 }
 
 window.verifyAndTopup = async function(){
 
-const fileInput=document.getElementById("slipInput");
-const status=document.getElementById("status");
-const btn=document.getElementById("uploadBtn");
+const fileInput=document.getElementById("slipInput")
+const status=document.getElementById("status")
+const btn=document.getElementById("uploadBtn")
 
-if(!fileInput.files[0]) return alert("กรุณาเลือกไฟล์สลิป");
-if(!auth.currentUser) return alert("กำลังโหลดผู้ใช้...");
+if(!fileInput.files[0])
+return alert("กรุณาเลือกไฟล์สลิป")
 
-btn.disabled=true;
-status.style.color="#3e2f27";
-status.innerText="กำลังตรวจสอบ...";
+btn.disabled=true
+status.style.color="#3e2f27"
+status.innerText="กำลังตรวจสอบ..."
 
-const formData=new FormData();
-formData.append("files",fileInput.files[0]);
-formData.append("log","true");
-formData.append("uid", auth.currentUser.uid); // ส่ง uid ไปให้ server
+const formData=new FormData()
+
+formData.append("files",fileInput.files[0])
+formData.append("log","true")
+formData.append("uid",user.id)
 
 try{
 
-const response=await fetch("/api/verify-slip", {
-method: "POST",
-body: formData
-});
+const response = await fetch("/api/verify-slip",{
+method:"POST",
+body:formData
+})
 
-const result=await response.json();
+const result = await response.json()
 
 if(result.success){
 
-status.style.color="green";
-status.innerText="✅ เติมเงินสำเร็จ";
-setTimeout(()=>window.location.href="profile.html",2000);
+status.style.color="green"
+status.innerText="✅ เติมเงินสำเร็จ"
+
+setTimeout(()=>{
+window.location.href="profile.html"
+},2000)
 
 }else{
 
-status.style.color="red";
-status.innerText=result.message || "❌ สลิปไม่ถูกต้อง";
+status.style.color="red"
+status.innerText=result.message || "❌ สลิปไม่ถูกต้อง"
 
 }
 
 }catch(err){
 
-console.error(err);
-status.style.color="red";
-status.innerText="เกิดข้อผิดพลาด: "+err.message;
+status.style.color="red"
+status.innerText="Server error"
 
 }
 
-btn.disabled=false;
+btn.disabled=false
+
 }
 
 </script>
+
 </body>
 </html>
