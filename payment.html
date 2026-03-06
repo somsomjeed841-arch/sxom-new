@@ -3,151 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Top Up - SXOM JEXM</title>
+<title>Topup</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:system-ui;
+}
 
 body{
-background:#d8ccc2;
-min-height:100vh;
+background:#0e0e0e;
+color:white;
 display:flex;
 justify-content:center;
 align-items:center;
+min-height:100vh;
 padding:20px;
 }
 
 .container{
 width:100%;
-max-width:450px;
-background:#f3eee9;
-padding:30px;
-border-radius:30px;
-box-shadow:0 20px 60px rgba(0,0,0,0.1);
+max-width:420px;
+background:#141414;
+border-radius:20px;
+padding:25px;
+box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+
+h2{
 text-align:center;
+margin-bottom:20px;
 }
 
 .tabs{
 display:flex;
-gap:10px;
-margin-bottom:25px;
-background:#ede5df;
-padding:5px;
-border-radius:15px;
+background:#1f1f1f;
+border-radius:12px;
+overflow:hidden;
+margin-bottom:20px;
 }
 
 .tab{
 flex:1;
-padding:10px;
-border-radius:12px;
+padding:12px;
+text-align:center;
 cursor:pointer;
 font-weight:600;
-color:#8c6b5a;
 font-size:14px;
+color:#aaa;
 }
 
 .tab.active{
-background:#8c6b5a;
+background:#2a2a2a;
 color:white;
 }
 
-.method-content{
+.method{
 display:none;
 }
 
-.method-content.active{
+.method.active{
 display:block;
 }
 
-.qr-section{
-background:white;
-padding:15px;
-border-radius:20px;
-display:inline-block;
-margin:15px 0;
-}
-
-.qr-img{
-width:180px;
-height:180px;
-object-fit:contain;
-}
-
-.upload-area{
-border:2px dashed #d1c4bc;
-border-radius:20px;
-padding:20px;
-background:#ede5df;
-margin:20px 0;
-}
-
-.btn-verify{
-background:#8c6b5a;
-color:white;
-border:none;
-padding:15px;
+.card{
+background:#1b1b1b;
 border-radius:15px;
+padding:15px;
+margin-bottom:15px;
+text-align:center;
+}
+
+.card img{
 width:100%;
-font-size:16px;
-font-weight:600;
+border-radius:10px;
+}
+
+.wallet-input{
+margin-top:15px;
+}
+
+.wallet-input input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:none;
+background:#222;
+color:white;
+}
+
+.bank-info{
+font-size:14px;
+line-height:1.8;
+text-align:left;
+}
+
+.copy{
+background:#2b2b2b;
+padding:8px 12px;
+border-radius:8px;
+cursor:pointer;
+font-size:12px;
+display:inline-block;
+margin-top:5px;
+}
+
+.upload{
+margin-top:20px;
+border:2px dashed #333;
+border-radius:15px;
+padding:25px;
+text-align:center;
 cursor:pointer;
 }
 
-.btn-verify:disabled{
-background:#ccc;
+.upload input{
+display:none;
+}
+
+.upload button{
+margin-top:10px;
+background:#333;
+border:none;
+color:white;
+padding:8px 15px;
+border-radius:8px;
+}
+
+.verify{
+margin-top:15px;
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:#00c853;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
 }
 
 .status{
-margin-top:15px;
+margin-top:10px;
+text-align:center;
 font-size:14px;
 min-height:20px;
 }
 
-.btn-back{
-margin-top:20px;
-display:inline-block;
-text-decoration:none;
-color:#8c6b5a;
-font-size:13px;
-}
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-<h2>เติมเงินเข้าระบบ</h2>
+<h2>เติมเงิน</h2>
 
 <div class="tabs">
-<div class="tab active" onclick="switchTab(event,'bank')">🏦 ธนาคาร</div>
+<div class="tab active" onclick="switchTab(event,'bank')">🏦 Mobile Banking</div>
 <div class="tab" onclick="switchTab(event,'wallet')">💳 TrueMoney</div>
 </div>
 
-<div id="bank-content" class="method-content active">
-<div class="qr-section">
-<img src="QRCode_20260302224649.png" class="qr-img">
-</div>
+<div id="bank" class="method active">
+
+<div class="card">
+<img src="QRCode_20260302224649.png">
 </div>
 
-<div id="wallet-content" class="method-content">
-<div class="qr-section">
-<img src="IMG_0517.png" class="qr-img">
-</div>
+<div class="card bank-info">
+
+ชื่อบัญชี<br>
+<b>อดิศร จันทะมาน</b><br>
+
+ธนาคาร<br>
+<b>กสิกรไทย</b><br>
+
+เลขบัญชี<br>
+<b id="acc">1448336782</b><br>
+
+<div class="copy" onclick="copyAcc()">คัดลอกเลขบัญชี</div>
+
 </div>
 
-<div class="upload-area">
-<p>อัปโหลดสลิป</p>
-<input type="file" id="slipInput" accept="image/*">
 </div>
 
-<button id="uploadBtn" class="btn-verify" onclick="verifyAndTopup()">
-ตรวจสอบสลิป
-</button>
+<div id="wallet" class="method">
+
+<div class="card">
+<img src="IMG_0517.png">
+</div>
+
+<div class="wallet-input">
+<input id="giftlink" placeholder="https://gift.truemoney.com/campaign/?v=xxxxxxxx">
+</div>
+
+</div>
+
+<label class="upload">
+
+ลาก & วาง เพื่ออัปโหลดสลิป
+<br>
+
+<button type="button">อัปโหลดไฟล์</button>
+
+<input type="file" id="slip" accept="image/*">
+
+</label>
+
+<button class="verify" onclick="verify()">ตรวจสอบสลิป</button>
 
 <div id="status" class="status"></div>
-
-<a href="shop.html" class="btn-back">← กลับหน้าหลัก</a>
 
 </div>
 
@@ -155,87 +223,89 @@ font-size:13px;
 
 <script type="module">
 
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
 const supabase = createClient(
 window.SUPABASE_URL,
 window.SUPABASE_KEY
 )
 
-const user = JSON.parse(localStorage.getItem("user"))
+const { data:{session} } = await supabase.auth.getSession()
 
-if(!user){
-window.location.href="index.html"
+if(!session){
+location.href="index.html"
 }
 
-window.switchTab = function(e,method){
+window.switchTab=function(e,id){
 
 document.querySelectorAll(".tab")
 .forEach(t=>t.classList.remove("active"))
 
-document.querySelectorAll(".method-content")
-.forEach(c=>c.classList.remove("active"))
+document.querySelectorAll(".method")
+.forEach(m=>m.classList.remove("active"))
 
-e.currentTarget.classList.add("active")
+e.target.classList.add("active")
 
-document
-.getElementById(method+"-content")
+document.getElementById(id)
 .classList.add("active")
 
 }
 
-window.verifyAndTopup = async function(){
+window.copyAcc=function(){
 
-const fileInput=document.getElementById("slipInput")
+const acc=document.getElementById("acc").innerText
+
+navigator.clipboard.writeText(acc)
+
+alert("คัดลอกเลขบัญชีแล้ว")
+
+}
+
+window.verify=async function(){
+
+const file=document.getElementById("slip").files[0]
+
 const status=document.getElementById("status")
-const btn=document.getElementById("uploadBtn")
 
-if(!fileInput.files[0])
-return alert("กรุณาเลือกไฟล์สลิป")
+if(!file){
 
-btn.disabled=true
-status.style.color="#3e2f27"
+alert("กรุณาเลือกสลิป")
+
+return
+
+}
+
 status.innerText="กำลังตรวจสอบ..."
 
 const formData=new FormData()
 
-formData.append("files",fileInput.files[0])
-formData.append("log","true")
-formData.append("uid",user.id)
+formData.append("file",file)
+formData.append("uid",session.user.id)
 
-try{
-
-const response = await fetch("/api/verify-slip",{
+const res=await fetch("/api/verify-slip",{
 method:"POST",
 body:formData
 })
 
-const result = await response.json()
+const data=await res.json()
 
-if(result.success){
+if(data.success){
 
-status.style.color="green"
-status.innerText="✅ เติมเงินสำเร็จ"
+status.style.color="lime"
+status.innerText="เติมเงินสำเร็จ"
 
 setTimeout(()=>{
-window.location.href="profile.html"
-},2000)
+
+location.href="profile.html"
+
+},1500)
 
 }else{
 
 status.style.color="red"
-status.innerText=result.message || "❌ สลิปไม่ถูกต้อง"
+status.innerText=data.message || "สลิปไม่ถูกต้อง"
 
 }
-
-}catch(err){
-
-status.style.color="red"
-status.innerText="Server error"
-
-}
-
-btn.disabled=false
 
 }
 
