@@ -1,143 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SXOM Auth</title>
+<title>SXOM JEXM</title>
 
 <style>
+
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Segoe UI',sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
 }
 
 body{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#d8ccc2;
+background:#d8ccc2;
+display:flex;
+align-items:center;
+justify-content:center;
+height:100vh;
 }
 
-.card{
-  width:380px;
-  padding:40px;
-  border-radius:20px;
-  background:#f3eee9;
-  box-shadow:0 20px 40px rgba(0,0,0,0.15);
-  text-align:center;
+.container{
+width:400px;
+background:#f3eee9;
+padding:30px;
+border-radius:20px;
+box-shadow:0 20px 40px rgba(0,0,0,0.2);
 }
 
-h2{
-  margin-bottom:20px;
-  color:#3e2f27;
+h1{
+text-align:center;
+margin-bottom:20px;
+color:#3e2f27;
 }
 
 input{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border-radius:10px;
-  border:1px solid #d4c4b8;
+width:100%;
+padding:12px;
+margin-bottom:12px;
+border:none;
+border-radius:10px;
+background:#e8dfd8;
 }
 
 button{
-  width:100%;
-  padding:12px;
-  margin-top:15px;
-  border:none;
-  border-radius:10px;
-  background:#8c6b5a;
-  color:white;
-  font-weight:600;
-  cursor:pointer;
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+background:#3e2f27;
+color:white;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+opacity:.9;
 }
 
 .switch{
-  margin-top:15px;
-}
-
-.switch span{
-  color:#8c6b5a;
-  cursor:pointer;
-  font-weight:600;
+text-align:center;
+margin-top:15px;
+font-size:14px;
+cursor:pointer;
+color:#3e2f27;
 }
 
 .hidden{
-  display:none;
+display:none;
 }
 
 .error{
-  color:red;
-  font-size:13px;
+color:red;
+font-size:13px;
+margin-bottom:10px;
 }
-</style>
 
+</style>
 </head>
+
 <body>
 
-<div class="card">
+<div class="container">
 
 <div id="loginBox">
-<h2>Sign In</h2>
 
-<input id="loginEmail" type="email" placeholder="Email">
+<h1>Login</h1>
+
+<input id="loginEmail" placeholder="Email">
 <input id="loginPass" type="password" placeholder="Password">
 
-<button onclick="login()">LOGIN</button>
+<button onclick="login()">Login</button>
 
-<div class="switch">
-Don't have account?
-<span onclick="showRegister()">Create Account</span>
+<div class="switch" onclick="showRegister()">
+Create account
 </div>
 
 </div>
+
 
 <div id="registerBox" class="hidden">
 
-<h2>Create Account</h2>
+<h1>Register</h1>
 
-<input id="regEmail" type="email" placeholder="Email">
+<input id="regEmail" placeholder="Email">
 <input id="regPass" type="password" placeholder="Password">
 <input id="regPass2" type="password" placeholder="Confirm Password">
 
 <div id="passError" class="error"></div>
 
-<button onclick="register()">REGISTER</button>
+<button onclick="register()">Register</button>
 
-<div class="switch">
-Already have account?
-<span onclick="showLogin()">Sign In</span>
+<div class="switch" onclick="showLogin()">
+Back to login
 </div>
 
 </div>
 
 </div>
-<script src="env.js"></script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="env.js"></script>
 
 <script>
 
 const supabase = window.supabase.createClient(
-window.SUPABASE_URL,
-window.SUPABASE_KEY
+window.ENV.SUPABASE_URL,
+window.ENV.SUPABASE_KEY
 )
 
 const loginBox = document.getElementById("loginBox")
 const registerBox = document.getElementById("registerBox")
 
-window.showRegister = function(){
+
+function showRegister(){
 loginBox.classList.add("hidden")
 registerBox.classList.remove("hidden")
 }
 
-window.showLogin = function(){
+function showLogin(){
 registerBox.classList.add("hidden")
 loginBox.classList.remove("hidden")
 }
 
-window.register = async function(){
+
+async function register(){
 
 const email = document.getElementById("regEmail").value
 const pass = document.getElementById("regPass").value
@@ -158,10 +167,9 @@ alert(error.message)
 return
 }
 
-await supabase.from("users").insert([{
+await supabase.from("profiles").insert([{
 id:data.user.id,
-email:email,
-credit:0
+balance:0
 }])
 
 alert("Account created")
@@ -170,7 +178,8 @@ showLogin()
 
 }
 
-window.login = async function(){
+
+async function login(){
 
 const email = document.getElementById("loginEmail").value
 const pass = document.getElementById("loginPass").value
@@ -187,11 +196,9 @@ return
 
 localStorage.setItem("user",JSON.stringify(data.user))
 
-window.location.href="shop.html"
+window.location.h=“shop.html”
 
 }
-
-</script>
-
+  </script>
 </body>
 </html>
