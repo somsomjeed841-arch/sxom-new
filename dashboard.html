@@ -15,51 +15,59 @@
 <button onclick="goToPayment()">เติมเงิน</button>
 
 <br><br>
-<button id="logoutBtn">LOGOUT</button>
+<button onclick="logout()">LOGOUT</button>
 
+<script src="env.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+<script>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAj1kaFq20fAoypR-J-OSJdqPAWMLXGHVg",
-  authDomain: "sxom-new.firebaseapp.com",
-  projectId: "sxom-new",
-  storageBucket: "sxom-new.firebasestorage.app",
-  messagingSenderId: "832664032721",
-  appId: "1:832664032721:web:80e756057b10d8d91d3cf0"
-};
+const supabase = window.supabase.createClient(
+window.SUPABASE_URL,
+window.SUPABASE_KEY
+)
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+async function loadUser(){
 
-onAuthStateChanged(auth, (user)=>{
-  if(!user){
-    window.location.href = "./index.html";
-  }else{
-    document.getElementById("userEmail").innerText = user.email;
-    loadBalance();
-  }
-});
+const { data: { user } } = await supabase.auth.getUser()
 
-function loadBalance(){
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
-
-  document.querySelectorAll(".balance-display").forEach(el=>{
-    el.innerText = "฿" + balance.toLocaleString();
-  });
+if(!user){
+window.location.href="index.html"
+return
 }
 
-window.goToPayment = function(){
-  window.location.href = "./payment.html"; // ✅ เด้งไปหน้าเลือกช่องทาง
+document.getElementById("userEmail").innerText=user.email
+
+loadBalance(user.id)
+
 }
 
-document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-  await signOut(auth);
-  window.location.href = "./index.html";
-});
+async function loadBalance(uid){
+
+const { data } = await supabase
+.from("users")
+.select("credit")
+.eq("id",uid)
+.single()
+
+const balance=data?.credit ?? 0
+
+document.querySelector(".balance-display").innerText =
+"฿"+Number(balance).toLocaleString()
+
+}
+
+function goToPayment(){
+window.location.href="payment.html"
+}
+
+async function logout(){
+await supabase.auth.signOut()
+window.location.href="index.html"
+}
+
+loadUser()
+
 </script>
 
 </body>
